@@ -23,7 +23,7 @@
 本文受到 [clean-code-javascript](https://github.com/ryanmcdermott/clean-code-javascript) 的启发
 
 ## **变量**
-### 使用有意义且可拼写的变量名
+### 使用见字知意的变量名
 
 **坏:**
 ```php
@@ -36,7 +36,7 @@ $currentDate = $moment->format('y-m-d');
 ```
 **[⬆ 返回顶部](#目录)**
 
-### 同种类型的变量使用相同词汇
+### 同一个实体要用相同的变量名
 
 **坏:**
 ```php
@@ -47,13 +47,15 @@ getCustomerRecord();
 
 **好:**
 ```php
-getUser();
+getUserInfo();
+getUserData();
+getUserRecord();
 ```
 **[⬆ 返回顶部](#目录)**
 
 ### 使用便于搜索的名称
-我们会阅读比我们写的更多的代码。所以写出高可读性和便于搜索的代码很重要。
-命名变量时如果*不*是有意义和易于理解的，那就是在伤害读者。
+写代码是用来读的。所以写出可读性高、便于搜索的代码至关重要。
+命名变量时如果没有有意义、不好理解，那就是在伤害读者。
 请让你的代码便于搜索。
 
 **坏:**
@@ -92,7 +94,8 @@ It's better, but we are still heavily dependent on regex.
 $address = 'One Infinite Loop, Cupertino 95014';
 $cityZipCodeRegex = '/^[^,\\]+[,\\\s]+(.+?)\s*(\d{5})?$/';
 preg_match($cityZipCodeRegex, $address, $matches);
-list(, $city, $zipCode) = $matchers;
+
+list(, $city, $zipCode) = $matches;
 saveCityZipCode($city, $zipCode);
 ```
 
@@ -109,8 +112,9 @@ saveCityZipCode($matches['city'], $matches['zipCode']);
 
 **[⬆ 返回顶部](#目录)**
 
-### 避免心理映射
-明确比隐性好。
+### 少用无意义的变量名
+别让读你的代码的人猜你写的变量是什么意思。
+写清楚好过模糊不清。
 
 **坏:**
 ```php
@@ -144,7 +148,7 @@ foreach ($locations as $location) {
 
 
 ### 不要添加不必要上下文
-如果你的class/object 名能告诉你什么，不要把它重复在你变量名里。
+如果从你的类名、对象名已经可以得知一些信息，就别再在变量名里重复。
 
 **坏:**
 
@@ -173,7 +177,7 @@ class Car
 ```
 **[⬆ 返回顶部](#目录)**
 
-###使用参数默认值代替短路或条件语句。
+### 合理使用参数默认值，没必要在方法里再做默认值检测
 **坏:**
 ```php
 function createMicrobrewery($name = null) {
@@ -193,10 +197,10 @@ function createMicrobrewery($breweryName = 'Hipster Brew Co.') {
 **[⬆ 返回顶部](#目录)**
 
 ## **函数**
-### 函数参数最好少于2个
-限制函数参数个数极其重要因为它是你函数测试容易点。有超过3个可选参数参数导致一个爆炸式组合增长，你会有成吨独立参数情形要测试。
+### 函数参数（最好少于2个）
+限制函数参数个数极其重要，这样测试你的函数容易点。有超过3个可选参数参数导致一个爆炸式组合增长，你会有成吨独立参数情形要测试。
 
-无参数是理想情况。1个或2个都可以，最好避免3个。再多旧需要加固了。通常如果你的函数有超过两个参数，说明他多做了一些事。 在参数少的情况里，大多数时候一个高级别对象（数组）作为参数就足够应付。
+无参数是理想情况。1个或2个都可以，最好避免3个。再多就需要加固了。通常如果你的函数有超过两个参数，说明他要处理的事太多了。 如果必须要传入很多数据，建议封装一个高级别对象作为参数。
 
 **坏:**
 ```php
@@ -230,7 +234,7 @@ function createMenu(MenuConfig $config) {
 
 
 ### 函数应该只做一件事
-这是迄今为止软件工程里最重要的一个规则。当函数做超过一件事的时候，他们就难于实现、测试和理解。当你隔离函数只剩一个功能时，他们就容易被重构，然后你的代码读起来就更清晰。如果你光遵循这条规则，你就领先于大多数开发者了。
+这是迄今为止软件工程里最重要的一个规则。当一个函数做超过一件事的时候，他们就难于实现、测试和理解。当你把一个函数拆分到只剩一个功能时，他们就容易被重构，然后你的代码读起来就更清晰。如果你光遵循这条规则，你就领先于大多数开发者了。
 
 **坏:**
 ```php
@@ -262,7 +266,7 @@ function isClientActive($client) {
 ```
 **[⬆ 返回顶部](#目录)**
 
-### 函数名应当描述他们所做的事
+### 函数名应该是有意义的动词（或表明具体做了什么事）
 
 **坏:**
 
@@ -278,7 +282,7 @@ class Email
 }
 
 $message = new Email(...);
-// What is this? A handle for the message? Are we writing to a file now?
+// 啥？handle处理一个消息干嘛了？
 $message->handle();
 ```
 
@@ -296,13 +300,16 @@ class Email
 }
 
 $message = new Email(...);
-// Clear and obvious
+// 简单明了
 $message->send();
 ```
 
 **[⬆ 返回顶部](#目录)**
 
-### 函数应当只为一层抽象，当你超过一层抽象时，函数正在做多件事。拆分功能易达到可重用性和易用性。.
+### 函数应当只有一层抽象abstraction
+
+当你抽象层次过多时时，函数处理的事情太多了。需要拆分功能来提高可重用性和易用性，以便简化测试。
+（译者注：这里从示例代码看应该是指嵌套过多）
 
 **坏:**
 
@@ -334,7 +341,7 @@ function parseBetterJSAlternative($code)
 
 **坏:**
 
-We have carried out some of the functionality, but the `parseBetterJSAlternative()` function is still very complex and not testable.
+我们把一些方法从循环中提取出来，但是`parseBetterJSAlternative()`方法还是很复杂，而且不利于测试。
 
 ```php
 function tokenize($code)
@@ -376,7 +383,7 @@ function parseBetterJSAlternative($code)
 
 **好:**
 
-The best solution is move out the dependencies of `parseBetterJSAlternative()` function.
+最好的解决方案是把 `parseBetterJSAlternative()`方法的依赖移除。
 
 ```php
 class Tokenizer
@@ -437,94 +444,14 @@ class BetterJSAlternative
     }
 }
 ```
-**[⬆ 返回顶部](#目录)**
 
-### 删除重复的代码
-尽你最大的努力来避免重复的代码。重复代码不好，因为它意味着如果你修改一些逻辑，那就有不止一处地方要同步修改了。
+这样我们可以对依赖做mock，并测试`BetterJSAlternative::parse()`运行是否符合预期。
 
-想象一下如果你经营着一家餐厅并跟踪它的库存: 你全部的西红柿、洋葱、大蒜、香料等。如果你保留有多个列表，当你服务一个有着西红柿的菜，那么所有记录都得更新。如果你只有一个列表，那么只需要修改一个地方！
-
-经常你容忍重复代码，因为你有两个或更多有共同部分但是少许差异的东西强制你用两个或更多独立的函数来做相同的事。移除重复代码意味着创造一个处理这组不同事物的一个抽象，只需要一个函数/模块/类。
-
-抽象正确非常重要，这也是为什么你应当遵循SOLID原则（奠定*Class*基础的原则）。坏的抽象可能比重复代码还要糟，因为要小心。在这个前提下，如果你可以抽象好，那就开始做把！不要重复你自己，否则任何你想改变一件事的时候你都发现在即在更新维护多处。
-
-**坏:**
-
-```php
-function showDeveloperList($developers)
-{
-    foreach ($developers as $developer) {
-        $expectedSalary = $developer->calculateExpectedSalary();
-        $experience = $developer->getExperience();
-        $githubLink = $developer->getGithubLink();
-        $data = [
-            $expectedSalary,
-            $experience,
-            $githubLink
-        ];
-        
-        render($data);
-    }
-}
-
-function showManagerList($managers)
-{
-    foreach ($managers as $manager) {
-        $expectedSalary = $manager->calculateExpectedSalary();
-        $experience = $manager->getExperience();
-        $githubLink = $manager->getGithubLink();
-        $data = [
-            $expectedSalary,
-            $experience,
-            $githubLink
-        ];
-        
-        render($data);
-    }
-}
-```
-
-**好:**
-
-```php
-function showList($employees)
-{
-    foreach ($employees as $employe) {
-        $expectedSalary = $employe->calculateExpectedSalary();
-        $experience = $employe->getExperience();
-        $githubLink = $employe->getGithubLink();
-        $data = [
-            $expectedSalary,
-            $experience,
-            $githubLink
-        ];
-        
-        render($data);
-    }
-}
-```
-
-
-**非常好:**
-
-It is better to use a compact version of the code.
-
-```php
-function showList($employees)
-{
-    foreach ($employees as $employe) {
-        render([
-            $employe->calculateExpectedSalary(),
-            $employe->getExperience(),
-            $employe->getGithubLink()
-        ]);
-    }
-}
-```
 **[⬆ 返回顶部](#目录)**
 
 
-### 不要用标志作为函数的参数，标志告诉你的用户函数做很多事了。函数应当只做一件事。 根据布尔值区别的路径来拆分你的复杂函数。
+### 不要用flag作为函数的参数
+flag就是在告诉大家，这个方法里处理很多事。前面刚说过，一个函数应当只做一件事。 把不同flag的代码拆分到多个函数里。
 
 **坏:**
 ```php
@@ -563,6 +490,8 @@ function createTempFile($name) {
 $name = 'Ryan McDermott';
 
 function splitIntoFirstAndLastName() {
+    global $name;
+
     $name = preg_split('/ /', $name);
 }
 
@@ -573,8 +502,6 @@ var_dump($name); // ['Ryan', 'McDermott'];
 
 **好:**
 ```php
-$name = 'Ryan McDermott';
-
 function splitIntoFirstAndLastName($name) {
     return preg_split('/ /', $name);
 }
@@ -713,7 +640,7 @@ if ($article->isPublished()) {
 ```
 **[⬆ 返回顶部](#目录)**
 
-### 避免消极条件
+### 避免用反义条件判断
 
 **坏:**
 ```php
@@ -788,9 +715,10 @@ class Cessna extends Airplane {
 ```
 **[⬆ 返回顶部](#目录)**
 
-### Avoid 避免类型检查 (part 1)
+### 避免类型检查 (part 1)
 PHP是弱类型的,这意味着你的函数可以接收任何类型的参数。
-有时候你为这自由所痛苦并且在你的函数渐渐尝试类型检查。有很多方法去避免这么做。第一种是考虑API的一致性。
+有时候你为这自由所痛苦并且在你的函数渐渐尝试类型检查。
+有很多方法去避免这么做。第一种是统一API。
 
 **坏:**
 
@@ -816,7 +744,10 @@ function travelToTexas(Traveler $vehicle)
 **[⬆ 返回顶部](#目录)**
 
 ### 避免类型检查 (part 2)
-如果你正使用基本原始值比如字符串、整形和数组，你不能用多态，你仍然感觉需要类型检测，你应当考虑类型声明或者严格模式。 这给你了基于标准PHP语法的静态类型。 手动检查类型的问题是做好了需要好多的废话，好像为了安全就可以不顾损失可读性。保持你的PHP 整洁，写好测试，做好代码回顾。做不到就用PHP严格类型声明和严格模式来确保安全。
+如果你正使用基本原始值比如字符串、整形和数组，要求版本是PHP 7+，不用多态，需要类型检测，
+那你应当考虑[类型声明](http://php.net/manual/en/functions.arguments.php#functions.arguments.type-declaration)或者严格模式。
+提供了基于标准PHP语法的静态类型。 手动检查类型的问题是做好了需要好多的废话，好像为了安全就可以不顾损失可读性。
+保持你的PHP 整洁，写好测试，做好代码回顾。做不到就用PHP严格类型声明和严格模式来确保安全。
 
 **坏:**
 
@@ -842,7 +773,8 @@ function combine(int $val1, int $val2)
 **[⬆ 返回顶部](#目录)**
 
 ### 移除僵尸代码
-僵尸代码和重复代码一样坏。没有理由保留在你的代码库中。如果从来被调用过，见鬼去！在你的版本库里是如果你仍然需要他的话，因此这么做很安全。
+僵尸代码和重复代码一样坏。没有理由保留在你的代码库中。如果从来没被调用过，就删掉！
+因为还在代码版本库里，因此很安全。
 
 **坏:**
 ```php
@@ -854,8 +786,8 @@ function newRequestModule($url) {
     // ...
 }
 
-$req = new newRequestModule($requestUrl);
-inventoryTracker('apples', $req, 'www.inventory-awesome.io');
+$request = newRequestModule($requestUrl);
+inventoryTracker('apples', $request, 'www.inventory-awesome.io');
 
 ```
 
@@ -865,8 +797,8 @@ function requestModule($url) {
     // ...
 }
 
-$req = new requestModule($requestUrl);
-inventoryTracker('apples', $req, 'www.inventory-awesome.io');
+$request = requestModule($requestUrl);
+inventoryTracker('apples', $request, 'www.inventory-awesome.io');
 ```
 **[⬆ 返回顶部](#目录)**
 
@@ -989,8 +921,9 @@ your codebase.
 ```php
 class UserSettings {
     private $user;
+
     public function __construct($user) {
-        $this->user = user;
+        $this->user = $user;
     }
     
     public function changeSettings($settings) {
@@ -1009,8 +942,9 @@ class UserSettings {
 ```php
 class UserAuth {
     private $user;
+
     public function __construct($user) {
-        $this->user = user;
+        $this->user = $user;
     }
     
     public function verifyCredentials() {
@@ -1021,6 +955,7 @@ class UserAuth {
 
 class UserSettings {
     private $user;
+
     public function __construct($user) {
         $this->user = $user;
         $this->auth = new UserAuth($user);
@@ -1164,52 +1099,59 @@ get into trouble.
 
 **坏:**
 ```php
-class Rectangle {
-    private $width, $height;
-    
-    public function __construct() {
+class Rectangle
+{
+    protected $width;
+    protected $height;
+
+    public function __construct()
+    {
         $this->width = 0;
         $this->height = 0;
     }
-    
-    public function setColor($color) {
+
+    public function render($area)
+    {
         // ...
     }
-    
-    public function render($area) {
-        // ...
-    }
-    
-    public function setWidth($width) {
+
+    public function setWidth($width)
+    {
         $this->width = $width;
     }
-    
-    public function setHeight($height) {
+
+    public function setHeight($height)
+    {
         $this->height = $height;
     }
-    
-    public function getArea() {
+
+    public function getArea()
+    {
         return $this->width * $this->height;
     }
 }
 
-class Square extends Rectangle {
-    public function setWidth($width) {
+class Square extends Rectangle
+{
+    public function setWidth($width)
+    {
         $this->width = $this->height = $width;
     }
-    
-    public function setHeight(height) {
+
+    public function setHeight(height)
+    {
         $this->width = $this->height = $height;
     }
 }
 
-function renderLargeRectangles($rectangles) {
-    foreach($rectangle in $rectangles) {
+function renderLargeRectangles($rectangles)
+{
+    foreach ($rectangles as $rectangle) {
         $rectangle->setWidth(4);
         $rectangle->setHeight(5);
         $area = $rectangle->getArea(); // BAD: Will return 25 for Square. Should be 20.
         $rectangle->render($area);
-    });
+    }
 }
 
 $rectangles = [new Rectangle(), new Rectangle(), new Square()];
@@ -1218,67 +1160,76 @@ renderLargeRectangles($rectangles);
 
 **好:**
 ```php
-abstract class Shape {
-    private $width, $height;
-    
+abstract class Shape
+{
+    protected $width;
+    protected $height;
+
     abstract public function getArea();
-    
-    public function setColor($color) {
-        // ...
-    }
-    
-    public function render($area) {
+
+    public function render($area)
+    {
         // ...
     }
 }
 
-class Rectangle extends Shape {
-    public function __construct {
-    parent::__construct();
+class Rectangle extends Shape
+{
+    public function __construct()
+    {
+        parent::__construct();
         $this->width = 0;
         $this->height = 0;
     }
-    
-    public function setWidth($width) {
+
+    public function setWidth($width)
+    {
         $this->width = $width;
     }
-    
-    public function setHeight($height) {
+
+    public function setHeight($height)
+    {
         $this->height = $height;
     }
-    
-    public function getArea() {
+
+    public function getArea()
+    {
         return $this->width * $this->height;
     }
 }
 
-class Square extends Shape {
-    public function __construct {
+class Square extends Shape
+{
+    public function __construct()
+    {
         parent::__construct();
         $this->length = 0;
     }
-    
-    public function setLength($length) {
+
+    public function setLength($length)
+    {
         $this->length = $length;
     }
-    
-    public function getArea() {
+
+    public function getArea()
+    {
         return pow($this->length, 2);
     }
 }
 
-function renderLargeRectangles($rectangles) {
-    foreach($rectangle in $rectangles) {
+function renderLargeRectangles($rectangles)
+{
+    foreach ($rectangles as $rectangle) {
         if ($rectangle instanceof Square) {
             $rectangle->setLength(5);
-        } else if ($rectangle instanceof Rectangle) {
+        } elseif ($rectangle instanceof Rectangle) {
             $rectangle->setWidth(4);
             $rectangle->setHeight(5);
         }
         
         $area = $rectangle->getArea(); 
         $rectangle->render($area);
-    });
+    }
 }
 
 $shapes = [new Rectangle(), new Rectangle(), new Square()];
@@ -1450,7 +1401,7 @@ class SuperWorker implements WorkerInterface {
 }
 
 class Manager {
-    /** @var Worker $worker **/
+    /** @var WorkerInterface $worker **/
     private $worker;
     
     public function __construct(WorkerInterface $worker) {
@@ -1589,8 +1540,8 @@ class Employee {
 class EmployeeTaxData extends Employee {
     private $ssn, $salary;
     
-    public function __construct($ssn, $salary) {
-        parent::__construct();
+    public function __construct($name, $email, $ssn, $salary) {
+        parent::__construct($name, $email);
         $this->ssn = $ssn;
         $this->salary = $salary;
     }
@@ -1624,6 +1575,105 @@ class Employee {
         $this->taxData = new EmployeeTaxData($ssn, $salary);
     }
     // ...
+}
+```
+**[⬆ 返回顶部](#目录)**
+
+## 别写重复代码 (DRY)
+
+Try to observe the [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) principle.
+
+Do your absolute best to avoid duplicate code. Duplicate code is bad because 
+it means that there's more than one place to alter something if you need to 
+change some logic.
+
+Imagine if you run a restaurant and you keep track of your inventory: all your 
+tomatoes, onions, garlic, spices, etc. If you have multiple lists that
+you keep this on, then all have to be updated when you serve a dish with
+tomatoes in them. If you only have one list, there's only one place to update!
+
+Oftentimes you have duplicate code because you have two or more slightly
+different things, that share a lot in common, but their differences force you
+to have two or more separate functions that do much of the same things. Removing 
+duplicate code means creating an abstraction that can handle this set of different 
+things with just one function/module/class.
+
+Getting the abstraction right is critical, that's why you should follow the
+SOLID principles laid out in the [Classes](#classes) section. Bad abstractions can be
+worse than duplicate code, so be careful! Having said this, if you can make
+a good abstraction, do it! Don't repeat yourself, otherwise you'll find yourself 
+updating multiple places anytime you want to change one thing.
+
+**Bad:**
+
+```php
+function showDeveloperList($developers)
+{
+    foreach ($developers as $developer) {
+        $expectedSalary = $developer->calculateExpectedSalary();
+        $experience = $developer->getExperience();
+        $githubLink = $developer->getGithubLink();
+        $data = [
+            $expectedSalary,
+            $experience,
+            $githubLink
+        ];
+        
+        render($data);
+    }
+}
+
+function showManagerList($managers)
+{
+    foreach ($managers as $manager) {
+        $expectedSalary = $manager->calculateExpectedSalary();
+        $experience = $manager->getExperience();
+        $githubLink = $manager->getGithubLink();
+        $data = [
+            $expectedSalary,
+            $experience,
+            $githubLink
+        ];
+        
+        render($data);
+    }
+}
+```
+
+**Good:**
+
+```php
+function showList($employees)
+{
+    foreach ($employees as $employee) {
+        $expectedSalary = $employee->calculateExpectedSalary();
+        $experience = $employee->getExperience();
+        $githubLink = $employee->getGithubLink();
+        $data = [
+            $expectedSalary,
+            $experience,
+            $githubLink
+        ];
+        
+        render($data);
+    }
+}
+```
+
+**Very good:**
+
+It is better to use a compact version of the code.
+
+```php
+function showList($employees)
+{
+    foreach ($employees as $employee) {
+        render([
+            $employee->calculateExpectedSalary(),
+            $employee->getExperience(),
+            $employee->getGithubLink()
+        ]);
+    }
 }
 ```
 **[⬆ 返回顶部](#目录)**
