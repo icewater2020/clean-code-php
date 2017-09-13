@@ -1,18 +1,49 @@
-# clean-code-php
+# Clean Code PHP
 
 ## 目录
+
   1. [介绍](#介绍)
   2. [变量](#变量)
+     * [使用见字知意的变量名](#使用见字知意的变量名)
+     * [同一个实体要用相同的变量名](#同一个实体要用相同的变量名)
+     * [使用便于搜索的名称 (part 1)](#使用便于搜索的名称part-1)
+     * [使用便于搜索的名称 (part 2)](#使用便于搜索的名称part-2)
+     * [使用自解释型变量](#使用自解释型变量)
+     * [少用无意义的变量名](#少用无意义的变量名)
+     * [Don't add unneeded context](#dont-add-unneeded-context)
+     * [合理使用参数默认值，没必要在方法里再做默认值检测](#合理使用参数默认值，没必要在方法里再做默认值检测)
   3. [函数](#函数)
+     * [Function arguments (2 or fewer ideally)](#function-arguments-2-or-fewer-ideally)
+     * [Functions should do one thing](#functions-should-do-one-thing)
+     * [Function names should say what they do](#function-names-should-say-what-they-do)
+     * [Functions should only be one level of abstraction](#functions-should-only-be-one-level-of-abstraction)
+     * [Don't use flags as function parameters](#dont-use-flags-as-function-parameters)
+     * [Avoid Side Effects](#avoid-side-effects)
+     * [Don't write to global functions](#dont-write-to-global-functions)
+     * [Don't use a Singleton pattern](#dont-use-a-singleton-pattern)
+     * [Encapsulate conditionals](#encapsulate-conditionals)
+     * [Avoid negative conditionals](#avoid-negative-conditionals)
+     * [Avoid conditionals](#avoid-conditionals)
+     * [Avoid type-checking (part 1)](#avoid-type-checking-part-1)
+     * [Avoid type-checking (part 2)](#avoid-type-checking-part-2)
+     * [Remove dead code](#remove-dead-code)
   4. [对象和数据结构 Objects and Data Structures](#objects-and-data-structures)
-  5. [类的SOLID原则 Classes](#classes)
-     1. [S: 单一功能 Single Responsibility Principle (SRP)](#single-responsibility-principle-srp)
-     2. [O: 开闭原则 Open/Closed Principle (OCP)](#openclosed-principle-ocp)
-     3. [L: 里氏替换 Liskov Substitution Principle (LSP)](#liskov-substitution-principle-lsp)
-     4. [I: 接口隔离 Interface Segregation Principle (ISP)](#interface-segregation-principle-isp)
-     5. [D: 依赖反转 Dependency Inversion Principle (DIP)](#dependency-inversion-principle-dip)
+     * [Use getters and setters](#use-getters-and-setters)
+     * [Make objects have private/protected members](#make-objects-have-privateprotected-members)
+  5. [Classes](#classes)
+     * [Use method chaining](#use-method-chaining)
+     * [Prefer composition over inheritance](#prefer-composition-over-inheritance)
+  6. [类的SOLID原则 SOLID](#solid)
+     * [S: 单一功能 Single Responsibility Principle (SRP)](#single-responsibility-principle-srp)
+     * [O: 开闭原则 Open/Closed Principle (OCP)](#openclosed-principle-ocp)
+     * [L: 里氏替换 Liskov Substitution Principle (LSP)](#liskov-substitution-principle-lsp)
+     * [I: 接口隔离 Interface Segregation Principle (ISP)](#interface-segregation-principle-isp)
+     * [D: 依赖反转 Dependency Inversion Principle (DIP)](#dependency-inversion-principle-dip)
+  7. [Don’t repeat yourself (DRY)](#dont-repeat-yourself-dry)
+  8. [Translations](#translations)
 
 ## 介绍
+
 本文由 php-cpm 基于 yangweijie 的[clen php code](https://github.com/jupeter/clean-code-php)翻译并同步大量原文内容，欢迎大家指正。
 
 本文参考自 Robert C. Martin的[*Clean Code*](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882)  书中的软件工程师的原则
@@ -26,69 +57,100 @@
 ### 使用见字知意的变量名
 
 **坏:**
+
 ```php
 $ymdstr = $moment->format('y-m-d');
 ```
 
 **好:**
+
 ```php
 $currentDate = $moment->format('y-m-d');
 ```
+
 **[⬆ 返回顶部](#目录)**
 
 ### 同一个实体要用相同的变量名
 
 **坏:**
-```php
-getUserInfo();
-getClientData();
-getCustomerRecord();
-```
 
-**好:**
 ```php
 getUserInfo();
 getUserData();
 getUserRecord();
+getUserProfile();
+```
+
+**好:**
+
+```php
+getUser();
 ```
 **[⬆ 返回顶部](#目录)**
 
-### 使用便于搜索的名称
+### 使用便于搜索的名称 (part 1)
 写代码是用来读的。所以写出可读性高、便于搜索的代码至关重要。
 命名变量时如果没有有意义、不好理解，那就是在伤害读者。
 请让你的代码便于搜索。
 
 **坏:**
 ```php
-// What the heck is 86400 for?
-addExpireAt(86400);
-
+// What the heck is 448 for?
+$result = $serializer->serialize($data, 448);
 ```
 
 **好:**
+
 ```php
-// Declare them as capitalized `const` globals.
-interface DateGlobal {
-    const SECONDS_IN_A_DAY = 86400;
+$json = $serializer->serialize($data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+```
+
+**[⬆ 返回顶部](#目录)**
+
+### 使用便于搜索的名称 (part 2)
+
+**坏:**
+
+```php
+// What the heck is 4 for?
+if ($user->access & 4) {
+    // ...
+}
+```
+
+**好:**
+
+```php
+class User
+{
+    const ACCESS_READ = 1;
+    const ACCESS_CREATE = 2;
+    const ACCESS_UPDATE = 4;
+    const ACCESS_DELETE = 8;
 }
 
-addExpireAt(DateGlobal::SECONDS_IN_A_DAY);
+if ($user->access & User::ACCESS_UPDATE) {
+    // do edit ...
+}
 ```
+
 **[⬆ 返回顶部](#目录)**
 
 
-### 使用解释型变量
+### 使用自解释型变量
+
 **坏:**
 ```php
 $address = 'One Infinite Loop, Cupertino 95014';
 $cityZipCodeRegex = '/^[^,\\]+[,\\\s]+(.+?)\s*(\d{5})?$/';
 preg_match($cityZipCodeRegex, $address, $matches);
+
 saveCityZipCode($matches[1], $matches[2]);
 ```
 
 **不错:**
 
-It's better, but we are still heavily dependent on regex.
+好一些，但强依赖于正则表达式的熟悉程度
 
 ```php
 $address = 'One Infinite Loop, Cupertino 95014';
@@ -101,7 +163,8 @@ saveCityZipCode($city, $zipCode);
 
 **好:**
 
-Decrease dependence on regex by naming subpatterns.
+使用带名字的子规则，不用懂正则也能看的懂
+
 ```php
 $address = 'One Infinite Loop, Cupertino 95014';
 $cityZipCodeRegex = '/^[^,\\]+[,\\\s]+(?<city>.+?)\s*(?<zipCode>\d{5})?$/';
@@ -112,13 +175,108 @@ saveCityZipCode($matches['city'], $matches['zipCode']);
 
 **[⬆ 返回顶部](#目录)**
 
+### Avoid nesting too deeply and return early
+
+Too many if else statemetns can make your code hard to follow. Explicit is better
+than implicit.
+
+**Bad:**
+
+```php
+function isShopOpen($day)
+{
+    if ($day) {
+        if (is_string($day)) {
+            $day = strtolower($day);
+            if ($day === 'friday') {
+                return true;
+            } elseif ($day === 'saturday') {
+                return true;
+            } elseif ($day === 'sunday') {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+}
+```
+
+**Good:**
+
+```php
+function isShopOpen($day)
+{
+    if (empty($day) && ! is_string($day)) {
+        return false;
+    }
+
+    $openingDays = [
+        'friday', 'saturday', 'sunday'
+    ];
+
+    return in_array(strtolower($day), $openingDays);
+}
+```
+
+**Bad:**
+
+```php
+function fibonacci($n)
+{
+    if ($n < 50) {
+        if ($n !== 0) {
+            if ($n !== 1) {
+                return fibonacci($n - 1) + fibonacci($n - 2);
+            } else {
+                return 1;
+            }
+        } else {
+            return 0;
+        }
+    } else {
+        return 'Not supported';
+    }
+}
+```
+
+**Good:**
+
+```php
+function fibonacci($n)
+{
+    if ($n === 0) {
+        return 0;
+    }
+
+    if ($n === 1) {
+        return 1;
+    }
+
+    if ($n > 50) {
+        return 'Not supported';
+    }
+
+    return fibonacci($n - 1) + fibonacci($n - 2);
+}
+```
+
+**[⬆ back to top](#table-of-contents)**
+
 ### 少用无意义的变量名
+
 别让读你的代码的人猜你写的变量是什么意思。
 写清楚好过模糊不清。
 
 **坏:**
+
 ```php
 $l = ['Austin', 'New York', 'San Francisco'];
+
 for ($i = 0; $i < count($l); $i++) {
     $li = $l[$i];
     doStuff();
@@ -127,11 +285,12 @@ for ($i = 0; $i < count($l); $i++) {
     // ...
     // ...
   // 等等, `$li` 又代表什么?
-  dispatch($li);
+    dispatch($li);
 }
 ```
 
 **好:**
+
 ```php
 $locations = ['Austin', 'New York', 'San Francisco'];
 
@@ -142,12 +301,13 @@ foreach ($locations as $location) {
     // ...
     // ...
     dispatch($location);
-});
+}
 ```
+
 **[⬆ 返回顶部](#目录)**
 
-
 ### 不要添加不必要上下文
+
 如果从你的类名、对象名已经可以得知一些信息，就别再在变量名里重复。
 
 **坏:**
@@ -175,25 +335,45 @@ class Car
     //...
 }
 ```
+
 **[⬆ 返回顶部](#目录)**
 
 ### 合理使用参数默认值，没必要在方法里再做默认值检测
-**坏:**
+
+**Not good:**
+
+This is not good because `$breweryName` can be `NULL`.
+
 ```php
-function createMicrobrewery($name = null) {
-    $breweryName = $name ?: 'Hipster Brew Co.';
+function createMicrobrewery($breweryName = 'Hipster Brew Co.')
+{
+    // ...
+}
+```
+
+**Not bad:**
+
+This opinion is more understandable than the previous version, but it better controls the value of the variable.
+
+```php
+function createMicrobrewery($name = null)
+{
+    $breweryName = $name ?: 'Hipster Brew Co.';
     // ...
 }
-
 ```
 
 **好:**
-```php
-function createMicrobrewery($breweryName = 'Hipster Brew Co.') {
-    // ...
-}
 
+If you support only PHP 7+, then you can use [type hinting](http://php.net/manual/en/functions.arguments.php#functions.arguments.type-declaration) and be sure that the `$breweryName` will not be `NULL`.
+
+```php
+function createMicrobrewery(string $breweryName = 'Hipster Brew Co.')
+{
+    // ...
+}
 ```
+
 **[⬆ 返回顶部](#目录)**
 
 ## **函数**
@@ -203,8 +383,10 @@ function createMicrobrewery($breweryName = 'Hipster Brew Co.') {
 无参数是理想情况。1个或2个都可以，最好避免3个。再多就需要加固了。通常如果你的函数有超过两个参数，说明他要处理的事太多了。 如果必须要传入很多数据，建议封装一个高级别对象作为参数。
 
 **坏:**
+
 ```php
-function createMenu($title, $body, $buttonText, $cancellable) {
+function createMenu($title, $body, $buttonText, $cancellable)
+{
     // ...
 }
 ```
@@ -225,11 +407,12 @@ $config->body = 'Bar';
 $config->buttonText = 'Baz';
 $config->cancellable = true;
 
-function createMenu(MenuConfig $config) {
-  // ...
+function createMenu(MenuConfig $config)
+{
+    // ...
 }
-
 ```
+
 **[⬆ 返回顶部](#目录)**
 
 
@@ -238,7 +421,8 @@ function createMenu(MenuConfig $config) {
 
 **坏:**
 ```php
-function emailClients($clients) {
+function emailClients($clients)
+{
     foreach ($clients as $client) {
         $clientRecord = $db->find($client);
         if ($clientRecord->isActive()) {
@@ -249,18 +433,23 @@ function emailClients($clients) {
 ```
 
 **好:**
+
 ```php
-function emailClients($clients) {
+function emailClients($clients)
+{
     $activeClients = activeClients($clients);
     array_walk($activeClients, 'email');
 }
 
-function activeClients($clients) {
+function activeClients($clients)
+{
     return array_filter($clients, 'isClientActive');
 }
 
-function isClientActive($client) {
+function isClientActive($client)
+{
     $clientRecord = $db->find($client);
+
     return $clientRecord->isActive();
 }
 ```
@@ -319,20 +508,20 @@ function parseBetterJSAlternative($code)
     $regexes = [
         // ...
     ];
-    
-    $statements = split(' ', $code);
+
+    $statements = explode(' ', $code);
     $tokens = [];
     foreach ($regexes as $regex) {
         foreach ($statements as $statement) {
             // ...
         }
     }
-    
+
     $ast = [];
     foreach ($tokens as $token) {
         // lex...
     }
-    
+
     foreach ($ast as $node) {
         // parse...
     }
@@ -349,15 +538,15 @@ function tokenize($code)
     $regexes = [
         // ...
     ];
-    
-    $statements = split(' ', $code);
+
+    $statements = explode(' ', $code);
     $tokens = [];
     foreach ($regexes as $regex) {
         foreach ($statements as $statement) {
             $tokens[] = /* ... */;
         }
     }
-    
+
     return $tokens;
 }
 
@@ -367,7 +556,7 @@ function lexer($tokens)
     foreach ($tokens as $token) {
         $ast[] = /* ... */;
     }
-    
+
     return $ast;
 }
 
@@ -394,7 +583,7 @@ class Tokenizer
             // ...
         ];
 
-        $statements = split(' ', $code);
+        $statements = explode(' ', $code);
         $tokens = [];
         foreach ($regexes as $regex) {
             foreach ($statements as $statement) {
@@ -405,9 +594,7 @@ class Tokenizer
         return $tokens;
     }
 }
-```
 
-```php
 class Lexer
 {
     public function lexify($tokens)
@@ -420,9 +607,7 @@ class Lexer
         return $ast;
     }
 }
-```
 
-```php
 class BetterJSAlternative
 {
     private $tokenizer;
@@ -455,7 +640,8 @@ flag就是在告诉大家，这个方法里处理很多事。前面刚说过，�
 
 **坏:**
 ```php
-function createFile($name, $temp = false) {
+function createFile($name, $temp = false)
+{
     if ($temp) {
         touch('./temp/'.$name);
     } else {
@@ -465,12 +651,15 @@ function createFile($name, $temp = false) {
 ```
 
 **好:**
+
 ```php
-function createFile($name) {
+function createFile($name)
+{
     touch($name);
 }
 
-function createTempFile($name) {
+function createTempFile($name)
+{
     touch('./temp/'.$name);
 }
 ```
@@ -484,15 +673,17 @@ function createTempFile($name) {
 重点是避免常见陷阱比如对象间共享无结构的数据，使用可以写入任何的可变数据类型，不集中处理副作用发生的地方。如果你做了这些你就会比大多数程序员快乐。
 
 **坏:**
+
 ```php
 // Global variable referenced by following function.
 // If we had another function that used this name, now it'd be an array and it could break it.
 $name = 'Ryan McDermott';
 
-function splitIntoFirstAndLastName() {
+function splitIntoFirstAndLastName()
+{
     global $name;
 
-    $name = preg_split('/ /', $name);
+    $name = explode(' ', $name);
 }
 
 splitIntoFirstAndLastName();
@@ -502,8 +693,9 @@ var_dump($name); // ['Ryan', 'McDermott'];
 
 **好:**
 ```php
-function splitIntoFirstAndLastName($name) {
-    return preg_split('/ /', $name);
+function splitIntoFirstAndLastName($name)
+{
+    return explode(' ', $name);
 }
 
 $name = 'Ryan McDermott';
@@ -512,6 +704,7 @@ $newName = splitIntoFirstAndLastName($name);
 var_dump($name); // 'Ryan McDermott';
 var_dump($newName); // ['Ryan', 'McDermott'];
 ```
+
 **[⬆ 返回顶部](#目录)**
 
 ### 不要写全局函数
@@ -530,15 +723,6 @@ function config()
 
 **好:**
 
-Create PHP configuration file or something else
-
-```php
-// config.php
-return [
-    'foo' => 'bar',
-];
-```
-
 ```php
 class Configuration
 {
@@ -556,10 +740,12 @@ class Configuration
 }
 ```
 
-Load configuration from file and create instance of `Configuration` class 
+Load configuration and create instance of `Configuration` class 
 
 ```php
-$configuration = new Configuration($configuration);
+$configuration = new Configuration([
+    'foo' => 'bar',
+]);
 ```
 
 And now you must use instance of `Configuration` in your application.
@@ -568,6 +754,7 @@ And now you must use instance of `Configuration` in your application.
 **[⬆ 返回顶部](#目录)**
 
 ### Don't use a Singleton pattern
+
 Singleton is a [anti-pattern](https://en.wikipedia.org/wiki/Singleton_pattern).
 
 **坏:**
@@ -643,19 +830,24 @@ if ($article->isPublished()) {
 ### 避免用反义条件判断
 
 **坏:**
+
 ```php
-function isDOMNodeNotPresent($node) {
+function isDOMNodeNotPresent($node)
+{
     // ...
 }
 
-if (!isDOMNodeNotPresent($node)) {
+if (!isDOMNodeNotPresent($node))
+{
     // ...
 }
 ```
 
 **好:**
+
 ```php
-function isDOMNodePresent($node) {
+function isDOMNodePresent($node)
+{
     // ...
 }
 
@@ -663,17 +855,23 @@ if (isDOMNodePresent($node)) {
     // ...
 }
 ```
+
 **[⬆ 返回顶部](#目录)**
 
 ### 避免条件声明
+
 这看起来像一个不可能任务。当人们第一次听到这句话是都会这么说。
 "没有一个`if声明`" 答案是你可以使用多态来达到许多case语句里的任务。第二个问题很常见， “那么为什么我要那么做？” 答案是前面我们学过的一个整洁代码原则：一个函数应当只做一件事。当你有类和函数有很多`if`声明,你自己知道你的函数做了不止一件事。记住，只做一件事。
 
 **坏:**
+
 ```php
-class Airplane {
+class Airplane
+{
     // ...
-    public function getCruisingAltitude() {
+
+    public function getCruisingAltitude()
+    {
         switch ($this->type) {
             case '777':
                 return $this->getMaxAltitude() - $this->getPassengerCount();
@@ -687,32 +885,46 @@ class Airplane {
 ```
 
 **好:**
+
 ```php
-class Airplane {
+interface Airplane
+{
     // ...
+
+    public function getCruisingAltitude();
 }
 
-class Boeing777 extends Airplane {
+class Boeing777 implements Airplane
+{
     // ...
-    public function getCruisingAltitude() {
+
+    public function getCruisingAltitude()
+    {
         return $this->getMaxAltitude() - $this->getPassengerCount();
     }
 }
 
-class AirForceOne extends Airplane {
+class AirForceOne implements Airplane
+{
     // ...
-    public function getCruisingAltitude() {
+
+    public function getCruisingAltitude()
+    {
         return $this->getMaxAltitude();
     }
 }
 
-class Cessna extends Airplane {
+class Cessna implements Airplane
+{
     // ...
-    public function getCruisingAltitude() {
+
+    public function getCruisingAltitude()
+    {
         return $this->getMaxAltitude() - $this->getFuelExpenditure();
     }
 }
 ```
+
 **[⬆ 返回顶部](#目录)**
 
 ### 避免类型检查 (part 1)
@@ -778,33 +990,39 @@ function combine(int $val1, int $val2)
 
 **坏:**
 ```php
-function oldRequestModule($url) {
+function oldRequestModule($url)
+{
     // ...
 }
 
-function newRequestModule($url) {
+function newRequestModule($url)
+{
     // ...
 }
 
 $request = newRequestModule($requestUrl);
 inventoryTracker('apples', $request, 'www.inventory-awesome.io');
-
 ```
 
 **好:**
+
 ```php
-function requestModule($url) {
+function requestModule($url)
+{
     // ...
 }
 
 $request = requestModule($requestUrl);
 inventoryTracker('apples', $request, 'www.inventory-awesome.io');
 ```
+
 **[⬆ 返回顶部](#目录)**
 
 
-## **Objects and Data Structures**
+## Objects and Data Structures
+
 ### Use getters and setters
+
 In PHP you can set `public`, `protected` and `private` keywords for methods. 
 Using it, you can control properties modification on an object. 
 
@@ -821,8 +1039,10 @@ Additionally, this is part of Open/Closed principle, from object-oriented
 design principles.
 
 **坏:**
+
 ```php
-class BankAccount {
+class BankAccount
+{
     public $balance = 1000;
 }
 
@@ -833,26 +1053,33 @@ $bankAccount->balance -= 100;
 ```
 
 **好:**
+
 ```php
-class BankAccount {
+class BankAccount
+{
     private $balance;
-    
-    public function __construct($balance = 1000) {
+
+    public function __construct($balance = 1000)
+    {
       $this->balance = $balance;
     }
-    
-    public function withdrawBalance($amount) {
+
+    public function withdrawBalance($amount)
+    {
         if ($amount > $this->balance) {
             throw new \Exception('Amount greater than available balance.');
         }
+
         $this->balance -= $amount;
     }
-    
-    public function depositBalance($amount) {
+
+    public function depositBalance($amount)
+    {
         $this->balance += $amount;
     }
-    
-    public function getBalance() {
+
+    public function getBalance()
+    {
         return $this->balance;
     }
 }
@@ -864,19 +1091,21 @@ $bankAccount->withdrawBalance($shoesPrice);
 
 // Get balance
 $balance = $bankAccount->getBalance();
-
 ```
-**[⬆ 返回顶部](#目录)**
 
+**[⬆ 返回顶部](#目录)**
 
 ### Make objects have private/protected members
 
 **坏:**
+
 ```php
-class Employee {
+class Employee
+{
     public $name;
-    
-    public function __construct($name) {
+
+    public function __construct($name)
+    {
         $this->name = $name;
     }
 }
@@ -886,15 +1115,19 @@ echo 'Employee name: '.$employee->name; // Employee name: John Doe
 ```
 
 **好:**
+
 ```php
-class Employee {
-    protected $name;
-    
-    public function __construct($name) {
+class Employee
+{
+    private $name;
+
+    public function __construct($name)
+    {
         $this->name = $name;
     }
-    
-    public function getName() {
+
+    public function getName()
+    {
         return $this->name;
     }
 }
@@ -902,12 +1135,212 @@ class Employee {
 $employee = new Employee('John Doe');
 echo 'Employee name: '.$employee->getName(); // Employee name: John Doe
 ```
+
 **[⬆ 返回顶部](#目录)**
 
+## Classes
 
-## **Classes**
+### Use method chaining
+
+This pattern is very useful and commonly used in many libraries such
+as PHPUnit and Doctrine. It allows your code to be expressive, and less verbose.
+For that reason, use method chaining and take a look at how clean your code
+will be. In your class functions, simply use `return $this` at the end of every `set` function,
+and you can chain further class methods onto it.
+
+**Bad:**
+
+```php
+class Car 
+{
+    private $make = 'Honda';
+    private $model = 'Accord';
+    private $color = 'white';
+
+    public function setMake($make)
+    {
+        $this->make = $make;
+    }
+
+    public function setModel($model)
+    {
+        $this->model = $model;
+    }
+
+    public function setColor($color)
+    {
+        $this->color = $color;
+    }
+
+    public function dump()
+    {
+        var_dump($this->make, $this->model, $this->color);
+    }
+}
+
+$car = new Car();
+$car->setColor('pink');
+$car->setMake('Ford');
+$car->setModel('F-150');
+$car->dump();
+```
+
+**Good:**
+
+```php
+class Car 
+{
+    private $make = 'Honda';
+    private $model = 'Accord';
+    private $color = 'white';
+
+    public function setMake($make)
+    {
+        $this->make = $make;
+        
+        // NOTE: Returning this for chaining
+        return $this;
+    }
+
+    public function setModel($model)
+    {
+        $this->model = $model;
+
+        // NOTE: Returning this for chaining
+        return $this;
+    }
+
+    public function setColor($color)
+    {
+        $this->color = $color;
+
+        // NOTE: Returning this for chaining
+        return $this;
+    }
+
+    public function dump()
+    {
+        var_dump($this->make, $this->model, $this->color);
+    }
+}
+
+$car = (new Car())
+  ->setColor('pink')
+  ->setMake('Ford')
+  ->setModel('F-150')
+  ->dump();
+```
+
+**[⬆ back to top](#table-of-contents)**
+
+### Prefer composition over inheritance
+
+As stated famously in [*Design Patterns*](https://en.wikipedia.org/wiki/Design_Patterns) by the Gang of Four,
+you should prefer composition over inheritance where you can. There are lots of
+good reasons to use inheritance and lots of good reasons to use composition.
+The main point for this maxim is that if your mind instinctively goes for
+inheritance, try to think if composition could model your problem better. In some
+cases it can.
+
+You might be wondering then, "when should I use inheritance?" It
+depends on your problem at hand, but this is a decent list of when inheritance
+makes more sense than composition:
+
+1. Your inheritance represents an "is-a" relationship and not a "has-a"
+relationship (Human->Animal vs. User->UserDetails).
+2. You can reuse code from the base classes (Humans can move like all animals).
+3. You want to make global changes to derived classes by changing a base class.
+(Change the caloric expenditure of all animals when they move).
+
+**Bad:**
+
+```php
+class Employee 
+{
+    private $name;
+    private $email;
+
+    public function __construct($name, $email)
+    {
+        $this->name = $name;
+        $this->email = $email;
+    }
+
+    // ...
+}
+
+// Bad because Employees "have" tax data. 
+// EmployeeTaxData is not a type of Employee
+
+class EmployeeTaxData extends Employee 
+{
+    private $ssn;
+    private $salary;
+    
+    public function __construct($name, $email, $ssn, $salary)
+    {
+        parent::__construct($name, $email);
+
+        $this->ssn = $ssn;
+        $this->salary = $salary;
+    }
+
+    // ...
+}
+```
+
+**Good:**
+
+```php
+class EmployeeTaxData 
+{
+    private $ssn;
+    private $salary;
+
+    public function __construct($ssn, $salary)
+    {
+        $this->ssn = $ssn;
+        $this->salary = $salary;
+    }
+
+    // ...
+}
+
+class Employee 
+{
+    private $name;
+    private $email;
+    private $taxData;
+
+    public function __construct($name, $email)
+    {
+        $this->name = $name;
+        $this->email = $email;
+    }
+
+    public function setTaxData($ssn, $salary)
+    {
+        $this->taxData = new EmployeeTaxData($ssn, $salary);
+    }
+
+    // ...
+}
+```
+
+**[⬆ back to top](#table-of-contents)**
+
+## SOLID
+
+**SOLID** is the mnemonic acronym introduced by Michael Feathers for the first five principles named by Robert Martin, which meant five basic principles of object-oriented programming and design.
+
+ * [S: Single Responsibility Principle (SRP)](#single-responsibility-principle-srp)
+ * [O: Open/Closed Principle (OCP)](#openclosed-principle-ocp)
+ * [L: Liskov Substitution Principle (LSP)](#liskov-substitution-principle-lsp)
+ * [I: Interface Segregation Principle (ISP)](#interface-segregation-principle-isp)
+ * [D: Dependency Inversion Principle (DIP)](#dependency-inversion-principle-dip)
 
 ### Single Responsibility Principle (SRP)
+
 As stated in Clean Code, "There should never be more than one reason for a class
 to change". It's tempting to jam-pack a class with a lot of functionality, like
 when you can only take one suitcase on your flight. The issue with this is
@@ -918,56 +1351,69 @@ it can be difficult to understand how that will affect other dependent modules i
 your codebase.
 
 **坏:**
+
 ```php
-class UserSettings {
+class UserSettings
+{
     private $user;
 
-    public function __construct($user) {
+    public function __construct($user)
+    {
         $this->user = $user;
     }
-    
-    public function changeSettings($settings) {
+
+    public function changeSettings($settings)
+    {
         if ($this->verifyCredentials()) {
             // ...
         }
     }
-    
-    private function verifyCredentials() {
+
+    private function verifyCredentials()
+    {
         // ...
     }
 }
 ```
 
 **好:**
+
 ```php
-class UserAuth {
+class UserAuth 
+{
     private $user;
 
-    public function __construct($user) {
+    public function __construct($user)
+    {
         $this->user = $user;
     }
     
-    public function verifyCredentials() {
+    public function verifyCredentials()
+    {
         // ...
     }
 }
 
-
-class UserSettings {
+class UserSettings 
+{
     private $user;
+    private $auth;
 
-    public function __construct($user) {
+    public function __construct($user) 
+    {
         $this->user = $user;
         $this->auth = new UserAuth($user);
     }
-    
-    public function changeSettings($settings) {
+
+    public function changeSettings($settings)
+    {
         if ($this->auth->verifyCredentials()) {
             // ...
         }
     }
 }
 ```
+
 **[⬆ 返回顶部](#目录)**
 
 ### Open/Closed Principle (OCP)
@@ -995,6 +1441,7 @@ class AjaxAdapter extends Adapter
     public function __construct()
     {
         parent::__construct();
+
         $this->name = 'ajaxAdapter';
     }
 }
@@ -1004,6 +1451,7 @@ class NodeAdapter extends Adapter
     public function __construct()
     {
         parent::__construct();
+
         $this->name = 'nodeAdapter';
     }
 }
@@ -1016,7 +1464,7 @@ class HttpRequester
     {
         $this->adapter = $adapter;
     }
-    
+
     public function fetch($url)
     {
         $adapterName = $this->adapter->getName();
@@ -1027,13 +1475,13 @@ class HttpRequester
             return $this->makeHttpCall($url);
         }
     }
-    
-    protected function makeAjaxCall($url)
+
+    private function makeAjaxCall($url)
     {
         // request and return promise
     }
-    
-    protected function makeHttpCall($url)
+
+    private function makeHttpCall($url)
     {
         // request and return promise
     }
@@ -1072,7 +1520,7 @@ class HttpRequester
     {
         $this->adapter = $adapter;
     }
-    
+
     public function fetch($url)
     {
         return $this->adapter->request($url);
@@ -1098,17 +1546,12 @@ if you model it using the "is-a" relationship via inheritance, you quickly
 get into trouble.
 
 **坏:**
+
 ```php
 class Rectangle
 {
-    protected $width;
-    protected $height;
-
-    public function __construct()
-    {
-        $this->width = 0;
-        $this->height = 0;
-    }
+    protected $width = 0;
+    protected $height = 0;
 
     public function render($area)
     {
@@ -1159,11 +1602,12 @@ renderLargeRectangles($rectangles);
 ```
 
 **好:**
+
 ```php
 abstract class Shape
 {
-    protected $width;
-    protected $height;
+    protected $width = 0;
+    protected $height = 0;
 
     abstract public function getArea();
 
@@ -1175,13 +1619,6 @@ abstract class Shape
 
 class Rectangle extends Shape
 {
-    public function __construct()
-    {
-        parent::__construct();
-        $this->width = 0;
-        $this->height = 0;
-    }
-
     public function setWidth($width)
     {
         $this->width = $width;
@@ -1200,11 +1637,7 @@ class Rectangle extends Shape
 
 class Square extends Shape
 {
-    public function __construct()
-    {
-        parent::__construct();
-        $this->length = 0;
-    }
+    private $length = 0;
 
     public function setLength($length)
     {
@@ -1226,7 +1659,7 @@ function renderLargeRectangles($rectangles)
             $rectangle->setWidth(4);
             $rectangle->setHeight(5);
         }
-        
+
         $area = $rectangle->getArea(); 
         $rectangle->render($area);
     }
@@ -1235,9 +1668,11 @@ function renderLargeRectangles($rectangles)
 $shapes = [new Rectangle(), new Rectangle(), new Square()];
 renderLargeRectangles($shapes);
 ```
+
 **[⬆ 返回顶部](#目录)**
 
 ### Interface Segregation Principle (ISP)
+
 ISP states that "Clients should not be forced to depend upon interfaces that
 they do not use." 
 
@@ -1247,100 +1682,88 @@ huge amounts of options is beneficial, because most of the time they won't need
 all of the settings. Making them optional helps prevent having a "fat interface".
 
 **坏:**
+
 ```php
-interface WorkerInterface {
+interface Employee
+{
     public function work();
+
     public function eat();
 }
 
-class Worker implements WorkerInterface {
-    public function work() {
+class Human implements Employee
+{
+    public function work()
+    {
         // ....working
     }
-    public function eat() {
-        // ...... eating in launch break
+
+    public function eat()
+    {
+        // ...... eating in lunch break
     }
 }
 
-class SuperWorker implements WorkerInterface {
-    public function work() {
+class Robot implements Employee
+{
+    public function work()
+    {
         //.... working much more
     }
 
-    public function eat() {
-        //.... eating in launch break
-    }
-}
-
-class Manager {
-  /** @var WorkerInterface $worker **/
-  private $worker;
-  
-  public function setWorker(WorkerInterface $worker) {
-        $this->worker = $worker;
-    }
-
-    public function manage() {
-        $this->worker->work();
+    public function eat()
+    {
+        //.... robot can't eat, but it must implement this method
     }
 }
 ```
 
 **好:**
-```php
-interface WorkerInterface extends FeedableInterface, WorkableInterface {
-}
 
-interface WorkableInterface {
+Not every worker is an employee, but every employee is an worker.
+
+```php
+interface Workable
+{
     public function work();
 }
 
-interface FeedableInterface {
+interface Feedable
+{
     public function eat();
 }
 
-class Worker implements WorkableInterface, FeedableInterface {
-    public function work() {
+interface Employee extends Feedable, Workable
+{
+}
+
+class Human implements Employee
+{
+    public function work()
+    {
         // ....working
     }
 
-    public function eat() {
-        //.... eating in launch break
+    public function eat()
+    {
+        //.... eating in lunch break
     }
 }
 
-class Robot implements WorkableInterface {
-    public function work() {
+// robot can only work
+class Robot implements Workable
+{
+    public function work()
+    {
         // ....working
-    }
-}
-
-class SuperWorker implements WorkerInterface  {
-    public function work() {
-        //.... working much more
-    }
-
-    public function eat() {
-        //.... eating in launch break
-    }
-}
-
-class Manager {
-  /** @var $worker WorkableInterface **/
-    private $worker;
-
-    public function setWorker(WorkableInterface $w) {
-      $this->worker = $w;
-    }
-
-    public function manage() {
-        $this->worker->work();
     }
 }
 ```
+
 **[⬆ 返回顶部](#目录)**
 
 ### Dependency Inversion Principle (DIP)
+
 This principle states two essential things:
 1. High-level modules should not depend on low-level modules. Both should
 depend on abstractions.
@@ -1355,228 +1778,80 @@ the coupling between modules. Coupling is a very bad development pattern because
 it makes your code hard to refactor.
 
 **坏:**
+
 ```php
-class Worker {
-  public function work() {
-    // ....working
-  }
-}
-
-class Manager {
-    /** @var Worker $worker **/
-    private $worker;
-    
-    public function __construct(Worker $worker) {
-        $this->worker = $worker;
-    }
-    
-    public function manage() {
-        $this->worker->work();
-    }
-}
-
-class SuperWorker extends Worker {
-    public function work() {
-        //.... working much more
-    }
-}
-```
-
-**好:**
-```php
-interface WorkerInterface {
-    public function work();
-}
-
-class Worker implements WorkerInterface {
-    public function work() {
+class Employee
+{
+    public function work()
+    {
         // ....working
     }
 }
 
-class SuperWorker implements WorkerInterface {
-    public function work() {
+class Robot extends Employee
+{
+    public function work()
+    {
         //.... working much more
     }
 }
 
-class Manager {
-    /** @var WorkerInterface $worker **/
-    private $worker;
-    
-    public function __construct(WorkerInterface $worker) {
-        $this->worker = $worker;
-    }
-    
-    public function manage() {
-        $this->worker->work();
-    }
-}
+class Manager
+{
+    private $employee;
 
-```
-**[⬆ 返回顶部](#目录)**
+    public function __construct(Employee $employee)
+    {
+        $this->employee = $employee;
+    }
 
-### Use method chaining
-This pattern is very useful and commonly used it many libraries such
-as PHPUnit and Doctrine. It allows your code to be expressive, and less verbose.
-For that reason, I say, use method chaining and take a look at how clean your code
-will be. In your class functions, simply return `this` at the end of every function,
-and you can chain further class methods onto it.
-
-**坏:**
-```php
-class Car {
-    private $make, $model, $color;
-    
-    public function __construct() {
-        $this->make = 'Honda';
-        $this->model = 'Accord';
-        $this->color = 'white';
+    public function manage()
+    {
+        $this->employee->work();
     }
-    
-    public function setMake($make) {
-        $this->make = $make;
-    }
-    
-    public function setModel($model) {
-        $this->model = $model;
-    }
-    
-    public function setColor($color) {
-        $this->color = $color;
-    }
-    
-    public function dump() {
-        var_dump($this->make, $this->model, $this->color);
-    }
-}
-
-$car = new Car();
-$car->setColor('pink');
-$car->setMake('Ford');
-$car->setModel('F-150');
-$car->dump();
-```
-
-**好:**
-```php
-class Car {
-    private $make, $model, $color;
-    
-    public function __construct() {
-        $this->make = 'Honda';
-        $this->model = 'Accord';
-        $this->color = 'white';
-    }
-    
-    public function setMake($make) {
-        $this->make = $make;
-        
-        // NOTE: Returning this for chaining
-        return $this;
-    }
-    
-    public function setModel($model) {
-        $this->model = $model;
-        
-        // NOTE: Returning this for chaining
-        return $this;
-    }
-    
-    public function setColor($color) {
-        $this->color = $color;
-        
-        // NOTE: Returning this for chaining
-        return $this;
-    }
-    
-    public function dump() {
-        var_dump($this->make, $this->model, $this->color);
-    }
-}
-
-$car = (new Car())
-  ->setColor('pink')
-  ->setMake('Ford')
-  ->setModel('F-150')
-  ->dump();
-```
-**[⬆ 返回顶部](#目录)**
-
-### Prefer composition over inheritance
-As stated famously in [*Design Patterns*](https://en.wikipedia.org/wiki/Design_Patterns) by the Gang of Four,
-you should prefer composition over inheritance where you can. There are lots of
-good reasons to use inheritance and lots of good reasons to use composition.
-The main point for this maxim is that if your mind instinctively goes for
-inheritance, try to think if composition could model your problem better. In some
-cases it can.
-
-You might be wondering then, "when should I use inheritance?" It
-depends on your problem at hand, but this is a decent list of when inheritance
-makes more sense than composition:
-
-1. Your inheritance represents an "is-a" relationship and not a "has-a"
-relationship (Human->Animal vs. User->UserDetails).
-2. You can reuse code from the base classes (Humans can move like all animals).
-3. You want to make global changes to derived classes by changing a base class.
-(Change the caloric expenditure of all animals when they move).
-
-**坏:**
-```php
-class Employee {
-    private $name, $email;
-    
-    public function __construct($name, $email) {
-        $this->name = $name;
-        $this->email = $email;
-    }
-    
-    // ...
-}
-
-// Bad because Employees "have" tax data. 
-// EmployeeTaxData is not a type of Employee
-
-class EmployeeTaxData extends Employee {
-    private $ssn, $salary;
-    
-    public function __construct($name, $email, $ssn, $salary) {
-        parent::__construct($name, $email);
-        $this->ssn = $ssn;
-        $this->salary = $salary;
-    }
-    
-    // ...
 }
 ```
 
 **好:**
+
 ```php
-class EmployeeTaxData {
-    private $ssn, $salary;
-    
-    public function __construct($ssn, $salary) {
-        $this->ssn = $ssn;
-        $this->salary = $salary;
-    }
-    
-    // ...
+interface Employee
+{
+    public function work();
 }
 
-class Employee {
-    private $name, $email, $taxData;
-    
-    public function __construct($name, $email) {
-        $this->name = $name;
-        $this->email = $email;
+class Human implements Employee
+{
+    public function work()
+    {
+        // ....working
     }
-    
-    public function setTaxData($ssn, $salary) {
-        $this->taxData = new EmployeeTaxData($ssn, $salary);
+}
+
+class Robot implements Employee
+{
+    public function work()
+    {
+        //.... working much more
     }
-    // ...
+}
+
+class Manager
+{
+    private $employee;
+
+    public function __construct(Employee $employee)
+    {
+        $this->employee = $employee;
+    }
+
+    public function manage()
+    {
+        $this->employee->work();
+    }
 }
 ```
+
 **[⬆ 返回顶部](#目录)**
 
 ## 别写重复代码 (DRY)
@@ -1609,7 +1884,7 @@ updating multiple places anytime you want to change one thing.
 ```php
 function showDeveloperList($developers)
 {
-    foreach ($developers as $developer) {
+    foreach ($developers as $developer) {
         $expectedSalary = $developer->calculateExpectedSalary();
         $experience = $developer->getExperience();
         $githubLink = $developer->getGithubLink();
@@ -1618,14 +1893,14 @@ function showDeveloperList($developers)
             $experience,
             $githubLink
         ];
-        
+
         render($data);
     }
 }
 
 function showManagerList($managers)
 {
-    foreach ($managers as $manager) {
+    foreach ($managers as $manager) {
         $expectedSalary = $manager->calculateExpectedSalary();
         $experience = $manager->getExperience();
         $githubLink = $manager->getGithubLink();
@@ -1634,7 +1909,7 @@ function showManagerList($managers)
             $experience,
             $githubLink
         ];
-        
+
         render($data);
     }
 }
@@ -1645,16 +1920,16 @@ function showManagerList($managers)
 ```php
 function showList($employees)
 {
-    foreach ($employees as $employee) {
-        $expectedSalary = $employee->calculateExpectedSalary();
-        $experience = $employee->getExperience();
-        $githubLink = $employee->getGithubLink();
+    foreach ($employees as $employee) {
+        $expectedSalary = $employee->calculateExpectedSalary();
+        $experience = $employee->getExperience();
+        $githubLink = $employee->getGithubLink();
         $data = [
             $expectedSalary,
             $experience,
             $githubLink
         ];
-        
+
         render($data);
     }
 }
@@ -1667,7 +1942,7 @@ It is better to use a compact version of the code.
 ```php
 function showList($employees)
 {
-    foreach ($employees as $employee) {
+    foreach ($employees as $employee) {
         render([
             $employee->calculateExpectedSalary(),
             $employee->getExperience(),
@@ -1676,4 +1951,15 @@ function showList($employees)
     }
 }
 ```
+
 **[⬆ 返回顶部](#目录)**
+
+## Translations
+
+This is also available in other languages:
+
+ * ![cn](https://raw.githubusercontent.com/gosquared/flags/master/flags/flags/shiny/24/China.png) **Chinese:**
+   * [yangweijie/clean-code-php](https://github.com/yangweijie/clean-code-php)
+   * [php-cpm/clean-code-php](https://github.com/php-cpm/clean-code-php)
+
+**[⬆ back to top](#table-of-contents)**
