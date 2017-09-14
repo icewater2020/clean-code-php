@@ -175,12 +175,11 @@ saveCityZipCode($matches['city'], $matches['zipCode']);
 
 **[⬆ 返回顶部](#目录)**
 
-### Avoid nesting too deeply and return early
+### 避免深层潜逃，尽早返回
 
-Too many if else statemetns can make your code hard to follow. Explicit is better
-than implicit.
+太多的if else语句通常会是你的代码难以阅读，直白优于隐晦
 
-**Bad:**
+**糟糕:**
 
 ```php
 function isShopOpen($day)
@@ -206,7 +205,7 @@ function isShopOpen($day)
 }
 ```
 
-**Good:**
+**好的:**
 
 ```php
 function isShopOpen($day)
@@ -223,7 +222,7 @@ function isShopOpen($day)
 }
 ```
 
-**Bad:**
+**糟糕的:**
 
 ```php
 function fibonacci($n)
@@ -244,7 +243,7 @@ function fibonacci($n)
 }
 ```
 
-**Good:**
+**好的:**
 
 ```php
 function fibonacci($n)
@@ -753,9 +752,9 @@ And now you must use instance of `Configuration` in your application.
 
 **[⬆ 返回顶部](#目录)**
 
-### Don't use a Singleton pattern
+### 不要使用单例模式
 
-Singleton is a [anti-pattern](https://en.wikipedia.org/wiki/Singleton_pattern).
+单例是一种 [anti-pattern](https://en.wikipedia.org/wiki/Singleton_pattern).
 
 **坏:**
 
@@ -1019,26 +1018,29 @@ inventoryTracker('apples', $request, 'www.inventory-awesome.io');
 **[⬆ 返回顶部](#目录)**
 
 
-## Objects and Data Structures
+## 对象和数据结构
 
-### Use getters and setters
+### 使用 getters 和 setters
+在PHP中你可以对方法使用`public`, `protected`, `private` 来控制对象属性的变更
+* 当你想对对象属性做获取之外的操作时，你不需要在代码中去寻找并修改每一个该属性访问方法
 
-In PHP you can set `public`, `protected` and `private` keywords for methods. 
-Using it, you can control properties modification on an object. 
-
-* When you want to do more beyond getting an object property, you don't have
-to look up and change every accessor in your codebase.
 * Makes adding validation simple when doing a `set`.
+* 当有`set`对应的属性方法时，易于增加参数的验证
 * Encapsulates the internal representation.
+* 封装内部的表示
 * Easy to add logging and error handling when getting and setting.
+* 使用set*和get*时，易于增加日志和错误控制
 * Inheriting this class, you can override default functionality.
+* 继承当前类时，可以复写默认的方法功能
 * You can lazy load your object's properties, let's say getting it from a
 server.
+* 当对象属性是从其他服务获取时，get*，set*易于使用延迟加载
 
 Additionally, this is part of Open/Closed principle, from object-oriented 
 design principles.
+此外，这样的方式也符合OOP开发中的开闭原则
 
-**坏:**
+**糟糕:**
 
 ```php
 class BankAccount
@@ -1096,8 +1098,9 @@ $balance = $bankAccount->getBalance();
 **[⬆ 返回顶部](#目录)**
 
 ### Make objects have private/protected members
+对象属性多使用private/protected 限定
 
-**坏:**
+**糟糕:**
 
 ```php
 class Employee
@@ -1138,17 +1141,15 @@ echo 'Employee name: '.$employee->getName(); // Employee name: John Doe
 
 **[⬆ 返回顶部](#目录)**
 
-## Classes
+## 类
 
-### Use method chaining
+### 使用方法链
 
-This pattern is very useful and commonly used in many libraries such
-as PHPUnit and Doctrine. It allows your code to be expressive, and less verbose.
-For that reason, use method chaining and take a look at how clean your code
-will be. In your class functions, simply use `return $this` at the end of every `set` function,
-and you can chain further class methods onto it.
+这是一种非常有用的，并且在其他类库中（PHPUnit 和 Doctrine）常用的模式
+它使你的代码更有表达力，减少冗余
+因为这个原因，来看看如何使用方法链来使你的代码变得清爽：在你的类的每一个`set`方法的最后简单的使用 `return $this`，然后进一步将类方法链起来
 
-**Bad:**
+**糟糕的:**
 
 ```php
 class Car 
@@ -1185,7 +1186,7 @@ $car->setModel('F-150');
 $car->dump();
 ```
 
-**Good:**
+**好的:**
 
 ```php
 class Car 
@@ -1197,7 +1198,7 @@ class Car
     public function setMake($make)
     {
         $this->make = $make;
-        
+
         // NOTE: Returning this for chaining
         return $this;
     }
@@ -1233,26 +1234,19 @@ $car = (new Car())
 
 **[⬆ back to top](#table-of-contents)**
 
-### Prefer composition over inheritance
+### 组合优于基础
 
-As stated famously in [*Design Patterns*](https://en.wikipedia.org/wiki/Design_Patterns) by the Gang of Four,
-you should prefer composition over inheritance where you can. There are lots of
-good reasons to use inheritance and lots of good reasons to use composition.
-The main point for this maxim is that if your mind instinctively goes for
-inheritance, try to think if composition could model your problem better. In some
-cases it can.
+正如之前所说[*Design Patterns*](https://en.wikipedia.org/wiki/Design_Patterns)  the Gang of Four 所著，
+我们应该尽量优先选择组合而不是继承的方式。使用继承和组合都有很多好处。
+这个准则的主要意义在于当你本能的使用继承时，试着思考一下`组合`是否能更好对你的需求建模。
+在一些情况下，是这样的。
 
-You might be wondering then, "when should I use inheritance?" It
-depends on your problem at hand, but this is a decent list of when inheritance
-makes more sense than composition:
+接下来你或许会想，“那我应该在什么时候使用继承？” 答案依赖于你的问题，当然下面有一些何时继承比组合更好的说明：
+1. 你的继承表达了“是一个”而不是“有一个”的关系（人类-》动物，用户-》用户详情）
+2. 你可以复用基类的代码（人类可以像动物一样移动）
+3. 你想通过修改基类对所有派生类做全局的修改（当动物移动时，修改她们的能量消耗）
 
-1. Your inheritance represents an "is-a" relationship and not a "has-a"
-relationship (Human->Animal vs. User->UserDetails).
-2. You can reuse code from the base classes (Humans can move like all animals).
-3. You want to make global changes to derived classes by changing a base class.
-(Change the caloric expenditure of all animals when they move).
-
-**Bad:**
+**糟糕的:**
 
 ```php
 class Employee 
@@ -1269,10 +1263,11 @@ class Employee
     // ...
 }
 
-// Bad because Employees "have" tax data. 
-// EmployeeTaxData is not a type of Employee
 
-class EmployeeTaxData extends Employee 
+// Employees "有" taxdata，EmployeeTaxData不是一种Employee，使用集成很糟糕
+
+
+class EmployeeTaxData extends Employee
 {
     private $ssn;
     private $salary;
@@ -1331,13 +1326,13 @@ class Employee
 
 ## SOLID
 
-**SOLID** is the mnemonic acronym introduced by Michael Feathers for the first five principles named by Robert Martin, which meant five basic principles of object-oriented programming and design.
+**SOLID** 是Michael Feathers推荐的便于记忆的首字母简写，它代表了Robert Martin命名的最重要的五个面对对象编码设计原则
+ * [S: 指责单一原则 (SRP)](#single-responsibility-principle-srp)
+ * [O: 开闭原则原则 (OCP)](#openclosed-principle-ocp)
+ * [L: 里氏替换原则 (LSP)](#liskov-substitution-principle-lsp)
+ * [I: 接口隔离原则 (ISP)](#interface-segregation-principle-isp)
+ * [D: 依赖反转原则 (DIP)](#dependency-inversion-principle-dip)
 
- * [S: Single Responsibility Principle (SRP)](#single-responsibility-principle-srp)
- * [O: Open/Closed Principle (OCP)](#openclosed-principle-ocp)
- * [L: Liskov Substitution Principle (LSP)](#liskov-substitution-principle-lsp)
- * [I: Interface Segregation Principle (ISP)](#interface-segregation-principle-isp)
- * [D: Dependency Inversion Principle (DIP)](#dependency-inversion-principle-dip)
 
 ### Single Responsibility Principle (SRP)
 
