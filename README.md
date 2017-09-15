@@ -1234,7 +1234,7 @@ $car = (new Car())
 
 **[⬆ back to top](#table-of-contents)**
 
-### 组合优于基础
+### 组合优于继承
 
 正如之前所说[*Design Patterns*](https://en.wikipedia.org/wiki/Design_Patterns)  the Gang of Four 所著，
 我们应该尽量优先选择组合而不是继承的方式。使用继承和组合都有很多好处。
