@@ -1336,14 +1336,8 @@ class Employee
 
 ### Single Responsibility Principle (SRP)
 
-As stated in Clean Code, "There should never be more than one reason for a class
-to change". It's tempting to jam-pack a class with a lot of functionality, like
-when you can only take one suitcase on your flight. The issue with this is
-that your class won't be conceptually cohesive and it will give it many reasons
-to change. Minimizing the amount of times you need to change a class is important.
-It's important because if too much functionality is in one class and you modify a piece of it,
-it can be difficult to understand how that will affect other dependent modules in
-your codebase.
+正如在Clean Code所述，"应该只为一个理由去修改类"。人们总是易于用一堆方法塞满一个类，如同我们只能在飞机上只能携带一个行李箱（把所有的东西都塞到箱子里）。这样做的问题是：从概念上这样的类不是高内聚的，并且留下了很多理由去修改它。将你需要修改类的次数降低到最小很重要。
+这是因为，当有很多方法在类中时，修改其中一处，你很难知晓在代码库中哪些依赖的模块会被影响到
 
 **坏:**
 
@@ -1374,7 +1368,7 @@ class UserSettings
 **好:**
 
 ```php
-class UserAuth 
+class UserAuth
 {
     private $user;
 
@@ -1382,19 +1376,19 @@ class UserAuth
     {
         $this->user = $user;
     }
-    
+
     public function verifyCredentials()
     {
         // ...
     }
 }
 
-class UserSettings 
+class UserSettings
 {
     private $user;
     private $auth;
 
-    public function __construct($user) 
+    public function __construct($user)
     {
         $this->user = $user;
         $this->auth = new UserAuth($user);
@@ -1411,12 +1405,9 @@ class UserSettings
 
 **[⬆ 返回顶部](#目录)**
 
-### Open/Closed Principle (OCP)
-
-As stated by Bertrand Meyer, "software entities (classes, modules, functions,
-etc.) should be open for extension, but closed for modification." What does that
-mean though? This principle basically states that you should allow users to
-add new functionalities without changing existing code.
+### 开闭原则 (OCP)
+正如Bertrand Meyer所述，"软件的工件（classes, modules, functions,等），
+应该对扩展开放，对修改关闭" 然而这句话意味着什么呢？这个原则大体上表示你应该允许在不改变已有代码的情况下增加新的功能
 
 **坏:**
 
@@ -1525,20 +1516,10 @@ class HttpRequester
 
 **[⬆ 返回顶部](#目录)**
 
-### Liskov Substitution Principle (LSP)
+### 里氏替换原则 (LSP)
+对一个简单的概念来说这是一个让人望而却步的术语。它的正式定义是"如果S是T的子类，在不改变程序原有既定属性的前提下，任何T的对象都可以使用S的对象替代（例如，使用S的对象可以替代T的对象）"这貌似是更吓人的阐述
 
-This is a scary term for a very simple concept. It's formally defined as "If S
-is a subtype of T, then objects of type T may be replaced with objects of type S
-(i.e., objects of type S may substitute objects of type T) without altering any
-of the desirable properties of that program (correctness, task performed,
-etc.)." That's an even scarier definition.
-
-The best explanation for this is if you have a parent class and a child class,
-then the base class and child class can be used interchangeably without getting
-incorrect results. This might still be confusing, so let's take a look at the
-classic Square-Rectangle example. Mathematically, a square is a rectangle, but
-if you model it using the "is-a" relationship via inheritance, you quickly
-get into trouble.
+对这个概念最好的解释是：如果你有一个父类和一个子类，在不改变原有结果正确性的前提下父类和子类可以互换。这个听起来依旧让人有些迷惑，所以让我们来看一个经典的正方形-长方形的例子。从数学上讲，正方形是一种长方形，但是当你的模型通过继承使用了"is-a"的关系时，你将发现你遇到了麻烦
 
 **坏:**
 
@@ -1655,7 +1636,7 @@ function renderLargeRectangles($rectangles)
             $rectangle->setHeight(5);
         }
 
-        $area = $rectangle->getArea(); 
+        $area = $rectangle->getArea();
         $rectangle->render($area);
     }
 }
@@ -1666,15 +1647,11 @@ renderLargeRectangles($shapes);
 
 **[⬆ 返回顶部](#目录)**
 
-### Interface Segregation Principle (ISP)
+### 接口隔离原则 (ISP)
 
-ISP states that "Clients should not be forced to depend upon interfaces that
-they do not use." 
+接口隔离原则表示："委托方不应该被强制依赖于他不需要的接口"
 
-A good example to look at that demonstrates this principle is for
-classes that require large settings objects. Not requiring clients to setup
-huge amounts of options is beneficial, because most of the time they won't need
-all of the settings. Making them optional helps prevent having a "fat interface".
+有一个清晰的例子来说明示范这条原则。当一个类需要一个大量的设置项，为了方便不会要求委托方去设置大量的选项，因为在大部分时间里他们不需要所有的设置项。使设置项可选有助于我们避免产生"胖接口"
 
 **坏:**
 
@@ -1715,7 +1692,7 @@ class Robot implements Employee
 
 **好:**
 
-Not every worker is an employee, but every employee is an worker.
+不是每一个工人都是雇员，但是每一个雇员都是一个工人
 
 ```php
 interface Workable
@@ -1757,20 +1734,13 @@ class Robot implements Workable
 
 **[⬆ 返回顶部](#目录)**
 
-### Dependency Inversion Principle (DIP)
+### 依赖倒置原则 (DIP)
 
-This principle states two essential things:
-1. High-level modules should not depend on low-level modules. Both should
-depend on abstractions.
-2. Abstractions should not depend upon details. Details should depend on
-abstractions.
+这条原则说明两个基本的要点：
+1.高阶的模块不应该依赖低阶的模块，它们都应该依赖于抽象
+2.抽象不应该依赖于实现，实现应该依赖于抽象
 
-This can be hard to understand at first, but if you've worked with PHP frameworks (like Symfony), you've seen an implementation of this principle in the form of Dependency
-Injection (DI). While they are not identical concepts, DIP keeps high-level
-modules from knowing the details of its low-level modules and setting them up.
-It can accomplish this through DI. A huge benefit of this is that it reduces
-the coupling between modules. Coupling is a very bad development pattern because
-it makes your code hard to refactor.
+这条起初看起来有点晦涩难懂，但是如果你使用过php框架（例如 Symfony），你应该见过依赖注入（DI）对这个概念的实现。虽然它们不是完全相通的概念，依赖倒置原则使高阶模块与低阶模块的实现细节和创建分离。可以使用依赖注入（DI）这种方式来实现它。更多的好处是它使模块之间解耦。耦合会导致你难于重构，它是一种非常糟糕的的开发模式
 
 **坏:**
 
@@ -1851,28 +1821,16 @@ class Manager
 
 ## 别写重复代码 (DRY)
 
-Try to observe the [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) principle.
+试着去遵循[DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) 原则.
 
-Do your absolute best to avoid duplicate code. Duplicate code is bad because 
-it means that there's more than one place to alter something if you need to 
-change some logic.
+尽你最大的努力去避免复制代码，它是一种非常糟糕的行为，复制代码通常意味着当你需要变更一些逻辑时，你需要修改不止一处
 
-Imagine if you run a restaurant and you keep track of your inventory: all your 
-tomatoes, onions, garlic, spices, etc. If you have multiple lists that
-you keep this on, then all have to be updated when you serve a dish with
-tomatoes in them. If you only have one list, there's only one place to update!
+试想一下，如果你在经营一家餐厅并且你在记录你仓库的进销记录：所有的土豆，洋葱，大蒜，辣椒等。
+如果你有多个列表来管理进销记录，当你用其中一些土豆做菜时你需要更新所有的列表。如果你只有一个列表，只有一个地方需要更新
 
-Oftentimes you have duplicate code because you have two or more slightly
-different things, that share a lot in common, but their differences force you
-to have two or more separate functions that do much of the same things. Removing 
-duplicate code means creating an abstraction that can handle this set of different 
-things with just one function/module/class.
+通常情况下你复制代码是应该有两个或者多个略微不同的逻辑，它们大多数都是一样的，但是由于它们的区别致使你必须有两个或者多个隔离的但大部分相同的方法，移除重复的代码意味着用一个function/module/class创建一个能处理差异的抽象
 
-Getting the abstraction right is critical, that's why you should follow the
-SOLID principles laid out in the [Classes](#classes) section. Bad abstractions can be
-worse than duplicate code, so be careful! Having said this, if you can make
-a good abstraction, do it! Don't repeat yourself, otherwise you'll find yourself 
-updating multiple places anytime you want to change one thing.
+正确的抽象是非常关键的，这正是为什么你必须学习遵守在[Classes](#classes)章节展开的SOLID原则，不合理的抽象比复制代码更糟糕，所有务必谨慎！说到这么多，如果你能设计一个合理的抽象，实现它！不要重复，否则你会发现任何时候当你想修改一个逻辑时你必须修改多个地方
 
 **Bad:**
 
