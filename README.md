@@ -175,12 +175,11 @@ saveCityZipCode($matches['city'], $matches['zipCode']);
 
 **[⬆ 返回顶部](#目录)**
 
-### Avoid nesting too deeply and return early
+### 避免深层潜逃，尽早返回
 
-Too many if else statemetns can make your code hard to follow. Explicit is better
-than implicit.
+太多的if else语句通常会是你的代码难以阅读，直白优于隐晦
 
-**Bad:**
+**糟糕:**
 
 ```php
 function isShopOpen($day)
@@ -206,7 +205,7 @@ function isShopOpen($day)
 }
 ```
 
-**Good:**
+**好的:**
 
 ```php
 function isShopOpen($day)
@@ -223,7 +222,7 @@ function isShopOpen($day)
 }
 ```
 
-**Bad:**
+**糟糕的:**
 
 ```php
 function fibonacci($n)
@@ -244,7 +243,7 @@ function fibonacci($n)
 }
 ```
 
-**Good:**
+**好的:**
 
 ```php
 function fibonacci($n)
@@ -753,9 +752,9 @@ And now you must use instance of `Configuration` in your application.
 
 **[⬆ 返回顶部](#目录)**
 
-### Don't use a Singleton pattern
+### 不要使用单例模式
 
-Singleton is a [anti-pattern](https://en.wikipedia.org/wiki/Singleton_pattern).
+单例是一种 [anti-pattern](https://en.wikipedia.org/wiki/Singleton_pattern).
 
 **坏:**
 
@@ -1019,26 +1018,29 @@ inventoryTracker('apples', $request, 'www.inventory-awesome.io');
 **[⬆ 返回顶部](#目录)**
 
 
-## Objects and Data Structures
+## 对象和数据结构
 
-### Use getters and setters
+### 使用 getters 和 setters
+在PHP中你可以对方法使用`public`, `protected`, `private` 来控制对象属性的变更
+* 当你想对对象属性做获取之外的操作时，你不需要在代码中去寻找并修改每一个该属性访问方法
 
-In PHP you can set `public`, `protected` and `private` keywords for methods. 
-Using it, you can control properties modification on an object. 
-
-* When you want to do more beyond getting an object property, you don't have
-to look up and change every accessor in your codebase.
 * Makes adding validation simple when doing a `set`.
+* 当有`set`对应的属性方法时，易于增加参数的验证
 * Encapsulates the internal representation.
+* 封装内部的表示
 * Easy to add logging and error handling when getting and setting.
+* 使用set*和get*时，易于增加日志和错误控制
 * Inheriting this class, you can override default functionality.
+* 继承当前类时，可以复写默认的方法功能
 * You can lazy load your object's properties, let's say getting it from a
 server.
+* 当对象属性是从其他服务获取时，get*，set*易于使用延迟加载
 
 Additionally, this is part of Open/Closed principle, from object-oriented 
 design principles.
+此外，这样的方式也符合OOP开发中的开闭原则
 
-**坏:**
+**糟糕:**
 
 ```php
 class BankAccount
@@ -1096,8 +1098,9 @@ $balance = $bankAccount->getBalance();
 **[⬆ 返回顶部](#目录)**
 
 ### Make objects have private/protected members
+对象属性多使用private/protected 限定
 
-**坏:**
+**糟糕:**
 
 ```php
 class Employee
@@ -1138,17 +1141,15 @@ echo 'Employee name: '.$employee->getName(); // Employee name: John Doe
 
 **[⬆ 返回顶部](#目录)**
 
-## Classes
+## 类
 
-### Use method chaining
+### 使用方法链
 
-This pattern is very useful and commonly used in many libraries such
-as PHPUnit and Doctrine. It allows your code to be expressive, and less verbose.
-For that reason, use method chaining and take a look at how clean your code
-will be. In your class functions, simply use `return $this` at the end of every `set` function,
-and you can chain further class methods onto it.
+这是一种非常有用的，并且在其他类库中（PHPUnit 和 Doctrine）常用的模式
+它使你的代码更有表达力，减少冗余
+因为这个原因，来看看如何使用方法链来使你的代码变得清爽：在你的类的每一个`set`方法的最后简单的使用 `return $this`，然后进一步将类方法链起来
 
-**Bad:**
+**糟糕的:**
 
 ```php
 class Car 
@@ -1185,7 +1186,7 @@ $car->setModel('F-150');
 $car->dump();
 ```
 
-**Good:**
+**好的:**
 
 ```php
 class Car 
@@ -1197,7 +1198,7 @@ class Car
     public function setMake($make)
     {
         $this->make = $make;
-        
+
         // NOTE: Returning this for chaining
         return $this;
     }
@@ -1233,26 +1234,19 @@ $car = (new Car())
 
 **[⬆ back to top](#table-of-contents)**
 
-### Prefer composition over inheritance
+### 组合优于继承
 
-As stated famously in [*Design Patterns*](https://en.wikipedia.org/wiki/Design_Patterns) by the Gang of Four,
-you should prefer composition over inheritance where you can. There are lots of
-good reasons to use inheritance and lots of good reasons to use composition.
-The main point for this maxim is that if your mind instinctively goes for
-inheritance, try to think if composition could model your problem better. In some
-cases it can.
+正如之前所说[*Design Patterns*](https://en.wikipedia.org/wiki/Design_Patterns)  the Gang of Four 所著，
+我们应该尽量优先选择组合而不是继承的方式。使用继承和组合都有很多好处。
+这个准则的主要意义在于当你本能的使用继承时，试着思考一下`组合`是否能更好对你的需求建模。
+在一些情况下，是这样的。
 
-You might be wondering then, "when should I use inheritance?" It
-depends on your problem at hand, but this is a decent list of when inheritance
-makes more sense than composition:
+接下来你或许会想，“那我应该在什么时候使用继承？” 答案依赖于你的问题，当然下面有一些何时继承比组合更好的说明：
+1. 你的继承表达了“是一个”而不是“有一个”的关系（人类-》动物，用户-》用户详情）
+2. 你可以复用基类的代码（人类可以像动物一样移动）
+3. 你想通过修改基类对所有派生类做全局的修改（当动物移动时，修改她们的能量消耗）
 
-1. Your inheritance represents an "is-a" relationship and not a "has-a"
-relationship (Human->Animal vs. User->UserDetails).
-2. You can reuse code from the base classes (Humans can move like all animals).
-3. You want to make global changes to derived classes by changing a base class.
-(Change the caloric expenditure of all animals when they move).
-
-**Bad:**
+**糟糕的:**
 
 ```php
 class Employee 
@@ -1269,10 +1263,11 @@ class Employee
     // ...
 }
 
-// Bad because Employees "have" tax data. 
-// EmployeeTaxData is not a type of Employee
 
-class EmployeeTaxData extends Employee 
+// Employees "有" taxdata，EmployeeTaxData不是一种Employee，使用集成很糟糕
+
+
+class EmployeeTaxData extends Employee
 {
     private $ssn;
     private $salary;
@@ -1331,24 +1326,18 @@ class Employee
 
 ## SOLID
 
-**SOLID** is the mnemonic acronym introduced by Michael Feathers for the first five principles named by Robert Martin, which meant five basic principles of object-oriented programming and design.
+**SOLID** 是Michael Feathers推荐的便于记忆的首字母简写，它代表了Robert Martin命名的最重要的五个面对对象编码设计原则
+ * [S: 指责单一原则 (SRP)](#single-responsibility-principle-srp)
+ * [O: 开闭原则原则 (OCP)](#openclosed-principle-ocp)
+ * [L: 里氏替换原则 (LSP)](#liskov-substitution-principle-lsp)
+ * [I: 接口隔离原则 (ISP)](#interface-segregation-principle-isp)
+ * [D: 依赖反转原则 (DIP)](#dependency-inversion-principle-dip)
 
- * [S: Single Responsibility Principle (SRP)](#single-responsibility-principle-srp)
- * [O: Open/Closed Principle (OCP)](#openclosed-principle-ocp)
- * [L: Liskov Substitution Principle (LSP)](#liskov-substitution-principle-lsp)
- * [I: Interface Segregation Principle (ISP)](#interface-segregation-principle-isp)
- * [D: Dependency Inversion Principle (DIP)](#dependency-inversion-principle-dip)
 
 ### Single Responsibility Principle (SRP)
 
-As stated in Clean Code, "There should never be more than one reason for a class
-to change". It's tempting to jam-pack a class with a lot of functionality, like
-when you can only take one suitcase on your flight. The issue with this is
-that your class won't be conceptually cohesive and it will give it many reasons
-to change. Minimizing the amount of times you need to change a class is important.
-It's important because if too much functionality is in one class and you modify a piece of it,
-it can be difficult to understand how that will affect other dependent modules in
-your codebase.
+正如在Clean Code所述，"应该只为一个理由去修改类"。人们总是易于用一堆方法塞满一个类，如同我们只能在飞机上只能携带一个行李箱（把所有的东西都塞到箱子里）。这样做的问题是：从概念上这样的类不是高内聚的，并且留下了很多理由去修改它。将你需要修改类的次数降低到最小很重要。
+这是因为，当有很多方法在类中时，修改其中一处，你很难知晓在代码库中哪些依赖的模块会被影响到
 
 **坏:**
 
@@ -1379,7 +1368,7 @@ class UserSettings
 **好:**
 
 ```php
-class UserAuth 
+class UserAuth
 {
     private $user;
 
@@ -1387,19 +1376,19 @@ class UserAuth
     {
         $this->user = $user;
     }
-    
+
     public function verifyCredentials()
     {
         // ...
     }
 }
 
-class UserSettings 
+class UserSettings
 {
     private $user;
     private $auth;
 
-    public function __construct($user) 
+    public function __construct($user)
     {
         $this->user = $user;
         $this->auth = new UserAuth($user);
@@ -1416,12 +1405,9 @@ class UserSettings
 
 **[⬆ 返回顶部](#目录)**
 
-### Open/Closed Principle (OCP)
-
-As stated by Bertrand Meyer, "software entities (classes, modules, functions,
-etc.) should be open for extension, but closed for modification." What does that
-mean though? This principle basically states that you should allow users to
-add new functionalities without changing existing code.
+### 开闭原则 (OCP)
+正如Bertrand Meyer所述，"软件的工件（classes, modules, functions,等），
+应该对扩展开放，对修改关闭" 然而这句话意味着什么呢？这个原则大体上表示你应该允许在不改变已有代码的情况下增加新的功能
 
 **坏:**
 
@@ -1530,20 +1516,10 @@ class HttpRequester
 
 **[⬆ 返回顶部](#目录)**
 
-### Liskov Substitution Principle (LSP)
+### 里氏替换原则 (LSP)
+对一个简单的概念来说这是一个让人望而却步的术语。它的正式定义是"如果S是T的子类，在不改变程序原有既定属性的前提下，任何T的对象都可以使用S的对象替代（例如，使用S的对象可以替代T的对象）"这貌似是更吓人的阐述
 
-This is a scary term for a very simple concept. It's formally defined as "If S
-is a subtype of T, then objects of type T may be replaced with objects of type S
-(i.e., objects of type S may substitute objects of type T) without altering any
-of the desirable properties of that program (correctness, task performed,
-etc.)." That's an even scarier definition.
-
-The best explanation for this is if you have a parent class and a child class,
-then the base class and child class can be used interchangeably without getting
-incorrect results. This might still be confusing, so let's take a look at the
-classic Square-Rectangle example. Mathematically, a square is a rectangle, but
-if you model it using the "is-a" relationship via inheritance, you quickly
-get into trouble.
+对这个概念最好的解释是：如果你有一个父类和一个子类，在不改变原有结果正确性的前提下父类和子类可以互换。这个听起来依旧让人有些迷惑，所以让我们来看一个经典的正方形-长方形的例子。从数学上讲，正方形是一种长方形，但是当你的模型通过继承使用了"is-a"的关系时，你将发现你遇到了麻烦
 
 **坏:**
 
@@ -1660,7 +1636,7 @@ function renderLargeRectangles($rectangles)
             $rectangle->setHeight(5);
         }
 
-        $area = $rectangle->getArea(); 
+        $area = $rectangle->getArea();
         $rectangle->render($area);
     }
 }
@@ -1671,15 +1647,11 @@ renderLargeRectangles($shapes);
 
 **[⬆ 返回顶部](#目录)**
 
-### Interface Segregation Principle (ISP)
+### 接口隔离原则 (ISP)
 
-ISP states that "Clients should not be forced to depend upon interfaces that
-they do not use." 
+接口隔离原则表示："委托方不应该被强制依赖于他不需要的接口"
 
-A good example to look at that demonstrates this principle is for
-classes that require large settings objects. Not requiring clients to setup
-huge amounts of options is beneficial, because most of the time they won't need
-all of the settings. Making them optional helps prevent having a "fat interface".
+有一个清晰的例子来说明示范这条原则。当一个类需要一个大量的设置项，为了方便不会要求委托方去设置大量的选项，因为在大部分时间里他们不需要所有的设置项。使设置项可选有助于我们避免产生"胖接口"
 
 **坏:**
 
@@ -1720,7 +1692,7 @@ class Robot implements Employee
 
 **好:**
 
-Not every worker is an employee, but every employee is an worker.
+不是每一个工人都是雇员，但是每一个雇员都是一个工人
 
 ```php
 interface Workable
@@ -1762,20 +1734,13 @@ class Robot implements Workable
 
 **[⬆ 返回顶部](#目录)**
 
-### Dependency Inversion Principle (DIP)
+### 依赖倒置原则 (DIP)
 
-This principle states two essential things:
-1. High-level modules should not depend on low-level modules. Both should
-depend on abstractions.
-2. Abstractions should not depend upon details. Details should depend on
-abstractions.
+这条原则说明两个基本的要点：
+1.高阶的模块不应该依赖低阶的模块，它们都应该依赖于抽象
+2.抽象不应该依赖于实现，实现应该依赖于抽象
 
-This can be hard to understand at first, but if you've worked with PHP frameworks (like Symfony), you've seen an implementation of this principle in the form of Dependency
-Injection (DI). While they are not identical concepts, DIP keeps high-level
-modules from knowing the details of its low-level modules and setting them up.
-It can accomplish this through DI. A huge benefit of this is that it reduces
-the coupling between modules. Coupling is a very bad development pattern because
-it makes your code hard to refactor.
+这条起初看起来有点晦涩难懂，但是如果你使用过php框架（例如 Symfony），你应该见过依赖注入（DI）对这个概念的实现。虽然它们不是完全相通的概念，依赖倒置原则使高阶模块与低阶模块的实现细节和创建分离。可以使用依赖注入（DI）这种方式来实现它。更多的好处是它使模块之间解耦。耦合会导致你难于重构，它是一种非常糟糕的的开发模式
 
 **坏:**
 
@@ -1856,28 +1821,16 @@ class Manager
 
 ## 别写重复代码 (DRY)
 
-Try to observe the [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) principle.
+试着去遵循[DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) 原则.
 
-Do your absolute best to avoid duplicate code. Duplicate code is bad because 
-it means that there's more than one place to alter something if you need to 
-change some logic.
+尽你最大的努力去避免复制代码，它是一种非常糟糕的行为，复制代码通常意味着当你需要变更一些逻辑时，你需要修改不止一处
 
-Imagine if you run a restaurant and you keep track of your inventory: all your 
-tomatoes, onions, garlic, spices, etc. If you have multiple lists that
-you keep this on, then all have to be updated when you serve a dish with
-tomatoes in them. If you only have one list, there's only one place to update!
+试想一下，如果你在经营一家餐厅并且你在记录你仓库的进销记录：所有的土豆，洋葱，大蒜，辣椒等。
+如果你有多个列表来管理进销记录，当你用其中一些土豆做菜时你需要更新所有的列表。如果你只有一个列表，只有一个地方需要更新
 
-Oftentimes you have duplicate code because you have two or more slightly
-different things, that share a lot in common, but their differences force you
-to have two or more separate functions that do much of the same things. Removing 
-duplicate code means creating an abstraction that can handle this set of different 
-things with just one function/module/class.
+通常情况下你复制代码是应该有两个或者多个略微不同的逻辑，它们大多数都是一样的，但是由于它们的区别致使你必须有两个或者多个隔离的但大部分相同的方法，移除重复的代码意味着用一个function/module/class创建一个能处理差异的抽象
 
-Getting the abstraction right is critical, that's why you should follow the
-SOLID principles laid out in the [Classes](#classes) section. Bad abstractions can be
-worse than duplicate code, so be careful! Having said this, if you can make
-a good abstraction, do it! Don't repeat yourself, otherwise you'll find yourself 
-updating multiple places anytime you want to change one thing.
+正确的抽象是非常关键的，这正是为什么你必须学习遵守在[Classes](#classes)章节展开的SOLID原则，不合理的抽象比复制代码更糟糕，所有务必谨慎！说到这么多，如果你能设计一个合理的抽象，实现它！不要重复，否则你会发现任何时候当你想修改一个逻辑时你必须修改多个地方
 
 **Bad:**
 
