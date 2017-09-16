@@ -1,5 +1,13 @@
 # Clean Code PHP
 
+## 翻译说明
+
+本文由 php-cpm 基于 [yangweijie版本](https://github.com/yangweijie/clean-code-php) 的[clean-code-php](https://github.com/jupeter/clean-code-php)翻译并同步大量原文内容。
+
+原文更新频率较高，我的翻译方法是直接用文本比较工具逐行对比。优先保证文字内容是最新的，再逐步提升翻译质量。
+
+阅读过程中如果遇到各种链接失效、内容老旧、术语使用错误和其他翻译错误等问题，欢迎大家积极提交PR。
+
 ## 目录
 
   1. [介绍](#介绍)
@@ -46,12 +54,6 @@
   8. [翻译](#翻译)
 
 ## 介绍
-
-本文由 php-cpm 基于 yangweijie 的[clen php code](https://github.com/jupeter/clean-code-php)翻译并同步大量原文内容，欢迎大家指正。
-
-原文更新频率较高，我的翻译方法是直接用文本比较工具逐行对比。优先保证文字内容是最新的，再逐步提升翻译质量。
-
-欢迎大家积极提PR。
 
 
 本文参考自 Robert C. Martin的[*Clean Code*](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship/dp/0132350882)  书中的软件工程师的原则
