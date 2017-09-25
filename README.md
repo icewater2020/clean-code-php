@@ -1,15 +1,5 @@
 # Clean Code PHP
 
-## 翻译说明
-
-本文由 php-cpm 基于 [yangweijie版本](https://github.com/yangweijie/clean-code-php) 的[clean-code-php](https://github.com/jupeter/clean-code-php)翻译并同步大量原文内容。
-
-原文更新频率较高，我的翻译方法是直接用文本比较工具逐行对比。优先保证文字内容是最新的，再逐步提升翻译质量。
-
-阅读过程中如果遇到各种链接失效、内容老旧、术语使用错误和其他翻译错误等问题，欢迎大家积极提交PR。
-
-虽然很多开发者还在使用PHP5，但是本文中的大部分示例的运行环境需要PHP 7.1+。
-
 ## 目录
 
   1. [介绍](#介绍)
@@ -64,6 +54,16 @@
 并不是这里所有的原则都得遵循，甚至很少的能被普遍接受。 这些虽然只是指导，但是都是*Clean Code*作者多年总结出来的。
 
 本文受到 [clean-code-javascript](https://github.com/ryanmcdermott/clean-code-javascript) 的启发
+
+虽然很多开发者还在使用PHP5，但是本文中的大部分示例的运行环境需要PHP 7.1+。
+
+## 翻译说明
+
+本文由 php-cpm 基于 [yangweijie版本](https://github.com/yangweijie/clean-code-php) 的[clean-code-php](https://github.com/jupeter/clean-code-php)翻译并同步大量原文内容。
+
+原文更新频率较高，我的翻译方法是直接用文本比较工具逐行对比。优先保证文字内容是最新的，再逐步提升翻译质量。
+
+阅读过程中如果遇到各种链接失效、内容老旧、术语使用错误和其他翻译错误等问题，欢迎大家积极提交PR。
 
 ## **变量**
 
@@ -230,7 +230,7 @@ function isShopOpen(string $day): bool
         'friday', 'saturday', 'sunday'
     ];
 
-    return in_array(strtolower($day), $openingDays);
+    return in_array(strtolower($day), $openingDays, true);
 }
 ```
 
@@ -264,12 +264,8 @@ function fibonacci(int $n)
 ```php
 function fibonacci(int $n): int
 {
-    if ($n === 0) {
-        return 0;
-    }
-
-    if ($n === 1) {
-        return 1;
+    if ($n === 0 || $n === 1) {
+        return $n;
     }
 
     if ($n > 50) {
@@ -580,7 +576,7 @@ function parseBetterJSAlternative(string $code): void
     $tokens = tokenize($code);
     $ast = lexer($tokens);
     foreach ($ast as $node) {
-        // parse...
+        // 解析逻辑...
     }
 }
 ```
@@ -639,7 +635,7 @@ class BetterJSAlternative
         $tokens = $this->tokenizer->tokenize($code);
         $ast = $this->lexer->lexify($tokens);
         foreach ($ast as $node) {
-            // parse...
+            // 解析逻辑...
         }
     }
 }
@@ -769,18 +765,17 @@ $configuration = new Configuration([
 
 And now you must use instance of `Configuration` in your application.
 
-
 **[⬆ 返回顶部](#目录)**
 
 ### 不要使用单例模式
 
-单例是一种 [反模式](https://en.wikipedia.org/wiki/Singleton_pattern).  Paraphrased from Brian Button:
- 1. They are generally used as a **global instance**, why is that so bad? Because **you hide the dependencies** of your application in your code, instead of exposing them through the interfaces. Making something global to avoid passing it around is a [code smell](https://en.wikipedia.org/wiki/Code_smell).
- 2. They violate the [single responsibility principle](#single-responsibility-principle-srp): by virtue of the fact that **they control their own creation and lifecycle**.
- 3. They inherently cause code to be tightly [coupled](https://en.wikipedia.org/wiki/Coupling_%28computer_programming%29). This makes faking them out under **test rather difficult** in many cases.
- 4. They carry state around for the lifetime of the application. Another hit to testing since **you can end up with a situation where tests need to be ordered** which is a big no for unit tests. Why? Because each unit test should be independent from the other.
+单例是一种 [反模式](https://en.wikipedia.org/wiki/Singleton_pattern).  以下是解释：Paraphrased from Brian Button:
+ 1. 总是被用成全局实例。They are generally used as a **global instance**, why is that so bad? Because **you hide the dependencies** of your application in your code, instead of exposing them through the interfaces. Making something global to avoid passing it around is a [code smell](https://en.wikipedia.org/wiki/Code_smell).
+ 2. 违反了[单一响应原则]()They violate the [single responsibility principle](#single-responsibility-principle-srp): by virtue of the fact that **they control their own creation and lifecycle**.
+ 3. 导致代码强耦合They inherently cause code to be tightly [coupled](https://en.wikipedia.org/wiki/Coupling_%28computer_programming%29). This makes faking them out under **test rather difficult** in many cases.
+ 4. 在整个程序的生命周期中始终携带状态。They carry state around for the lifetime of the application. Another hit to testing since **you can end up with a situation where tests need to be ordered** which is a big no for unit tests. Why? Because each unit test should be independent from the other.
 
-There is also very good thoughts by [Misko Hevery](http://misko.hevery.com/about/) about the [root of problem](http://misko.hevery.com/2008/08/25/root-cause-of-singletons/).
+这里有一篇非常好的讨论单例模式的[根本问题((http://misko.hevery.com/2008/08/25/root-cause-of-singletons/)的文章，是[Misko Hevery](http://misko.hevery.com/about/) 写的。
 
 **坏:**
 
@@ -1124,6 +1119,13 @@ $balance = $bankAccount->getBalance();
 
 ### 对象属性多使用private/protected限定
 
+* 对`public`方法和属性进行修改非常危险，因为外部代码容易依赖他，而你没办法控制。**对之修改影响所有这个类的使用者。** `public` methods and properties are most dangerous for changes, because some outside code may easily rely on them and you can't control what code relies on them. **Modifications in class are dangerous for all users of class.**
+* 对`protected`的修改跟对`public`修改差不多危险，因为他们对子类可用，他俩的唯一区别就是可调用的位置不一样，**对之修改影响所有集成这个类的地方。**  `protected` modifier are as dangerous as public, because they are available in scope of any child class. This effectively means that difference between public and protected is only in access mechanism, but encapsulation guarantee remains the same. **Modifications in class are dangerous for all descendant classes.**
+* 对`private`的修改保证了这部分代码**只会影响当前类**`private` modifier guarantees that code is **dangerous to modify only in boundaries of single class** (you are safe for modifications and you won't have [Jenga effect](http://www.urbandictionary.com/define.php?term=Jengaphobia&defid=2494196)).
+
+所以，当你需要控制类里的代码可以被访问时才用`public/protected`，其他时候都用`private`。
+
+可以读一读这篇 [博客文章](http://fabien.potencier.org/pragmatism-over-theory-protected-vs-private.html) ，[Fabien Potencier](https://github.com/fabpot)写的.
 
 **糟糕:**
 
@@ -1175,7 +1177,9 @@ echo 'Employee name: '.$employee->getName(); // Employee name: John Doe
 这个准则的主要意义在于当你本能的使用继承时，试着思考一下`组合`是否能更好对你的需求建模。
 在一些情况下，是这样的。
 
-接下来你或许会想，“那我应该在什么时候使用继承？” 答案依赖于你的问题，当然下面有一些何时继承比组合更好的说明：
+接下来你或许会想，“那我应该在什么时候使用继承？” 
+答案依赖于你的问题，当然下面有一些何时继承比组合更好的说明：
+
 1. 你的继承表达了“是一个”而不是“有一个”的关系（人类-》动物，用户-》用户详情）
 2. 你可以复用基类的代码（人类可以像动物一样移动）
 3. 你想通过修改基类对所有派生类做全局的修改（当动物移动时，修改她们的能量消耗）
@@ -1979,11 +1983,11 @@ function showList(array $employees): void
 其他语言的翻译:
 
 *  :cn: **Chinese:**
-   * [yangweijie/clean-code-php](https://github.com/yangweijie/clean-code-php)
    * [php-cpm/clean-code-php](https://github.com/php-cpm/clean-code-php)
-   * [gbcr/clean-code-php](https://github.com/gbcr/clean-code-php)
 * :ru: **Russian:**
    * [peter-gribanov/clean-code-php](https://github.com/peter-gribanov/clean-code-php)
+* :es: **Spanish:**
+   * [fikoborquez/clean-code-php](https://github.com/fikoborquez/clean-code-php)
 * :brazil: **Portuguese:**
    * [fabioars/clean-code-php](https://github.com/fabioars/clean-code-php)
    * [jeanjar/clean-code-php](https://github.com/jeanjar/clean-code-php/tree/pt-br)
