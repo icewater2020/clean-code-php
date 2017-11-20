@@ -99,9 +99,11 @@ getUserProfile();
 ```php
 getUser();
 ```
+
 **[⬆ 返回顶部](#目录)**
 
 ### 使用便于搜索的名称 (part 1)
+
 写代码是用来读的。所以写出可读性高、便于搜索的代码至关重要。
 命名变量时如果没有有意义、不好理解，那就是在伤害读者。
 请让你的代码便于搜索。
@@ -148,13 +150,13 @@ if ($user->access & User::ACCESS_UPDATE) {
 
 **[⬆ 返回顶部](#目录)**
 
-
 ### 使用自解释型变量
 
 **坏:**
+
 ```php
 $address = 'One Infinite Loop, Cupertino 95014';
-$cityZipCodeRegex = '/^[^,\\]+[,\\\s]+(.+?)\s*(\d{5})?$/';
+$cityZipCodeRegex = '/^[^,]+,\s*(.+?)\s*(\d{5})$/';
 preg_match($cityZipCodeRegex, $address, $matches);
 
 saveCityZipCode($matches[1], $matches[2]);
@@ -166,7 +168,7 @@ saveCityZipCode($matches[1], $matches[2]);
 
 ```php
 $address = 'One Infinite Loop, Cupertino 95014';
-$cityZipCodeRegex = '/^[^,\\]+[,\\\s]+(.+?)\s*(\d{5})?$/';
+$cityZipCodeRegex = '/^[^,]+,\s*(.+?)\s*(\d{5})$/';
 preg_match($cityZipCodeRegex, $address, $matches);
 
 [, $city, $zipCode] = $matches;
@@ -179,7 +181,7 @@ saveCityZipCode($city, $zipCode);
 
 ```php
 $address = 'One Infinite Loop, Cupertino 95014';
-$cityZipCodeRegex = '/^[^,\\]+[,\\\s]+(?<city>.+?)\s*(?<zipCode>\d{5})?$/';
+$cityZipCodeRegex = '/^[^,]+,\s*(?<city>.+?)\s*(?<zipCode>\d{5})$/';
 preg_match($cityZipCodeRegex, $address, $matches);
 
 saveCityZipCode($matches['city'], $matches['zipCode']);
@@ -217,7 +219,7 @@ function isShopOpen($day): bool
 }
 ```
 
-**好的:**
+**好:**
 
 ```php
 function isShopOpen(string $day): bool
@@ -259,7 +261,7 @@ function fibonacci(int $n)
 }
 ```
 
-**好的:**
+**好:**
 
 ```php
 function fibonacci(int $n): int
@@ -353,7 +355,7 @@ class Car
 
 **不好:**
 
-This is not good because `$breweryName` can be `NULL`.
+不好，`$breweryName` 可能为 `NULL`.
 
 ```php
 function createMicrobrewery($breweryName = 'Hipster Brew Co.'): void
@@ -364,7 +366,7 @@ function createMicrobrewery($breweryName = 'Hipster Brew Co.'): void
 
 **还行:**
 
-This opinion is more understandable than the previous version, but it better controls the value of the variable.
+比上一个好理解一些，但最好能控制变量的值
 
 ```php
 function createMicrobrewery($name = null): void
@@ -388,7 +390,9 @@ function createMicrobrewery(string $breweryName = 'Hipster Brew Co.'): void
 **[⬆ 返回顶部](#目录)**
 
 ## **函数**
+
 ### 函数参数（最好少于2个）
+
 限制函数参数个数极其重要，这样测试你的函数容易点。有超过3个可选参数参数导致一个爆炸式组合增长，你会有成吨独立参数情形要测试。
 
 无参数是理想情况。1个或2个都可以，最好避免3个。再多就需要加固了。通常如果你的函数有超过两个参数，说明他要处理的事太多了。 如果必须要传入很多数据，建议封装一个高级别对象作为参数。
@@ -428,9 +432,11 @@ function createMenu(MenuConfig $config): void
 **[⬆ 返回顶部](#目录)**
 
 ### 函数应该只做一件事
+
 这是迄今为止软件工程里最重要的一个规则。当一个函数做超过一件事的时候，他们就难于实现、测试和理解。当你把一个函数拆分到只剩一个功能时，他们就容易被重构，然后你的代码读起来就更清晰。如果你光遵循这条规则，你就领先于大多数开发者了。
 
 **坏:**
+
 ```php
 function emailClients(array $clients): void
 {
@@ -464,6 +470,7 @@ function isClientActive(int $client): bool
     return $clientRecord->isActive();
 }
 ```
+
 **[⬆ 返回顶部](#目录)**
 
 ### 函数名应该是有意义的动词（或表明具体做了什么事）
@@ -677,6 +684,7 @@ function createTempFile(string $name): void
 **[⬆ 返回顶部](#目录)**
 
 ### 避免副作用
+
 一个函数做了比获取一个值然后返回另外一个值或值们会产生副作用如果。副作用可能是写入一个文件，修改某些全局变量或者偶然的把你全部的钱给了陌生人。
 
 现在，你的确需要在一个程序或者场合里要有副作用，像之前的例子，你也许需要写一个文件。你想要做的是把你做这些的地方集中起来。不要用几个函数和类来写入一个特定的文件。用一个服务来做它，一个只有一个。
@@ -755,7 +763,7 @@ class Configuration
 }
 ```
 
-Load configuration and create instance of `Configuration` class 
+加载配置并创建 `Configuration` 类的实例
 
 ```php
 $configuration = new Configuration([
@@ -763,7 +771,7 @@ $configuration = new Configuration([
 ]);
 ```
 
-And now you must use instance of `Configuration` in your application.
+现在你必须在程序中用 `Configuration` 的实例了
 
 **[⬆ 返回顶部](#目录)**
 
@@ -818,13 +826,13 @@ class DBConnection
 }
 ```
 
-Create instance of `DBConnection` class and configure it with [DSN](http://php.net/manual/en/pdo.construct.php#refsect1-pdo.construct-parameters).
+创建 `DBConnection` 类的实例并通过 [DSN](http://php.net/manual/en/pdo.construct.php#refsect1-pdo.construct-parameters) 配置.
 
 ```php
 $connection = new DBConnection($dsn);
 ```
 
-And now you must use instance of `DBConnection` in your application.
+现在你必须在程序中 使用 `DBConnection` 的实例了
 
 **[⬆ 返回顶部](#目录)**
 
@@ -845,6 +853,7 @@ if ($article->isPublished()) {
     // ...
 }
 ```
+
 **[⬆ 返回顶部](#目录)**
 
 ### 避免用反义条件判断
@@ -982,6 +991,7 @@ function travelToTexas(Traveler $vehicle): void
 **[⬆ 返回顶部](#目录)**
 
 ### 避免类型检查 (part 2)
+
 如果你正使用基本原始值比如字符串、整形和数组，要求版本是PHP 7+，不用多态，需要类型检测，
 那你应当考虑[类型声明](http://php.net/manual/en/functions.arguments.php#functions.arguments.type-declaration)或者严格模式。
 提供了基于标准PHP语法的静态类型。 手动检查类型的问题是做好了需要好多的废话，好像为了安全就可以不顾损失可读性。
@@ -1012,6 +1022,7 @@ function combine(int $val1, int $val2): int
 **[⬆ 返回顶部](#目录)**
 
 ### 移除僵尸代码
+
 僵尸代码和重复代码一样坏。没有理由保留在你的代码库中。如果从来没被调用过，就删掉！
 因为还在代码版本库里，因此很安全。
 
@@ -1049,6 +1060,7 @@ inventoryTracker('apples', $request, 'www.inventory-awesome.io');
 ## 对象和数据结构
 
 ### 使用 getters 和 setters
+
 在PHP中你可以对方法使用`public`, `protected`, `private` 来控制对象属性的变更。
 
 * 当你想对对象属性做获取之外的操作时，你不需要在代码中去寻找并修改每一个该属性访问方法
@@ -1060,7 +1072,7 @@ inventoryTracker('apples', $request, 'www.inventory-awesome.io');
 
 此外，这样的方式也符合OOP开发中的[开闭原则](#openclosed-principle-ocp)
 
-**糟糕:**
+**坏:**
 
 ```php
 class BankAccount
@@ -1086,7 +1098,7 @@ class BankAccount
       $this->balance = $balance;
     }
 
-    public function withdrawBalance(int $amount): void
+    public function withdraw(int $amount): void
     {
         if ($amount > $this->balance) {
             throw new \Exception('Amount greater than available balance.');
@@ -1095,12 +1107,12 @@ class BankAccount
         $this->balance -= $amount;
     }
 
-    public function depositBalance(int $amount): void
+    public function deposit(int $amount): void
     {
         $this->balance += $amount;
     }
 
-    public function getBalance(): int
+    public function getBalance(): int
     {
         return $this->balance;
     }
@@ -1109,7 +1121,7 @@ class BankAccount
 $bankAccount = new BankAccount();
 
 // Buy shoes...
-$bankAccount->withdrawBalance($shoesPrice);
+$bankAccount->withdraw($shoesPrice);
 
 // Get balance
 $balance = $bankAccount->getBalance();
@@ -1127,7 +1139,7 @@ $balance = $bankAccount->getBalance();
 
 可以读一读这篇 [博客文章](http://fabien.potencier.org/pragmatism-over-theory-protected-vs-private.html) ，[Fabien Potencier](https://github.com/fabpot)写的.
 
-**糟糕:**
+**坏:**
 
 ```php
 class Employee
@@ -1273,13 +1285,13 @@ pattern reduces the verbosity of the code (for example the [PHPUnit Mock Builder
 or the [Doctrine Query Builder](http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/query-builder.html)),
 more often it comes at some costs:
 
-1. Breaks [Encapsulation](https://en.wikipedia.org/wiki/Encapsulation_%28object-oriented_programming%29)
-2. Breaks [Decorators](https://en.wikipedia.org/wiki/Decorator_pattern)
-3. Is harder to [mock](https://en.wikipedia.org/wiki/Mock_object) in a test suite
-4. Makes diffs of commits harder to read
+1. 破坏了 [对象封装](https://en.wikipedia.org/wiki/Encapsulation_%28object-oriented_programming%29)
+2. 破坏了 [装饰器模式](https://en.wikipedia.org/wiki/Decorator_pattern)
+3. 在测试组件中不好做[mock](https://en.wikipedia.org/wiki/Mock_object)
+4. 导致提交的diff不好阅读
 
-For more informations you can read the full [blog post](https://ocramius.github.io/blog/fluent-interfaces-are-evil/)
-on this topic written by [Marco Pivetta](https://github.com/Ocramius).
+了解更多请阅读 [连贯接口为什么不好](https://ocramius.github.io/blog/fluent-interfaces-are-evil/)
+，作者 [Marco Pivetta](https://github.com/Ocramius).
 
 **坏:**
 
@@ -1620,7 +1632,10 @@ class Square extends Rectangle
     }
 }
 
-function renderLargeRectangles(Rectangle $rectangles): void
+/**
+ * @param Rectangle[] $rectangles
+ */
+function renderLargeRectangles(array $rectangles): void
 {
     foreach ($rectangles as $rectangle) {
         $rectangle->setWidth(4);
@@ -1683,7 +1698,10 @@ class Square extends Shape
     }
 }
 
-function renderLargeRectangles(Shape $rectangles): void
+/**
+ * @param Rectangle[] $rectangles
+ */
+function renderLargeRectangles(array $rectangles): void
 {
     foreach ($rectangles as $rectangle) {
         if ($rectangle instanceof Square) {
@@ -1961,7 +1979,7 @@ function showList(array $employees): void
 
 **极好:**
 
-It is better to use a compact version of the code.
+最好让代码紧凑一点
 
 ```php
 function showList(array $employees): void
