@@ -59,7 +59,7 @@
 
 ## 翻译说明
 
-本文由 php-cpm 基于 [yangweijie版本](https://github.com/yangweijie/clean-code-php) 的[clean-code-php](https://github.com/jupeter/clean-code-php)翻译并同步大量原文内容。
+翻译完成度100%，最后更新时间2017-12-25。本文由 php-cpm 基于 [yangweijie版本](https://github.com/yangweijie/clean-code-php) 的[clean-code-php](https://github.com/jupeter/clean-code-php)翻译并同步大量原文内容。
 
 原文更新频率较高，我的翻译方法是直接用文本比较工具逐行对比。优先保证文字内容是最新的，再逐步提升翻译质量。
 
@@ -2000,7 +2000,7 @@ function showList(array $employees): void
 
 其他语言的翻译:
 
-*  :cn: **Chinese:**
+* :cn: **Chinese:**
    * [php-cpm/clean-code-php](https://github.com/php-cpm/clean-code-php)
 * :ru: **Russian:**
    * [peter-gribanov/clean-code-php](https://github.com/peter-gribanov/clean-code-php)
@@ -2011,5 +2011,7 @@ function showList(array $employees): void
    * [jeanjar/clean-code-php](https://github.com/jeanjar/clean-code-php/tree/pt-br)
 * :thailand: **Thai:**
    * [panuwizzle/clean-code-php](https://github.com/panuwizzle/clean-code-php)
-
+* :fr: **French:**
+   * [errorname/clean-code-php](https://github.com/errorname/clean-code-php)
+   
 **[⬆ 返回顶部](#目录)**
