@@ -15,7 +15,9 @@
      * [少用无意义的变量名](#少用无意义的变量名)
      * [不要添加不必要上下文](#不要添加不必要上下文)
      * [合理使用参数默认值，没必要在方法里再做默认值检测](#合理使用参数默认值没必要在方法里再做默认值检测)
-  3. [函数](#函数)
+  3. [Comparaison](#comparaison)
+     * [Use identical comparison](#identical_comparison)
+  4. [函数](#函数)
      * [函数参数（最好少于2个）](#函数参数-最好少于2个)
      * [函数应该只做一件事](#函数应该只做一件事)
      * [函数名应该是有意义的动词（或表明具体做了什么事）](#函数名应该是有意义的动词或表明具体做了什么事)
@@ -30,20 +32,20 @@
      * [避免类型检查 (part 1)](#避免类型检查-part-1)
      * [避免类型检查 (part 2)](#避免类型检查-part-2)
      * [移除僵尸代码](#移除僵尸代码)
-  4. [对象和数据结构 Objects and Data Structures](#对象和数据结构)
+  5. [对象和数据结构 Objects and Data Structures](#对象和数据结构)
      * [使用 getters 和 setters Use object encapsulation](#使用-getters-和-setters)
      * [对象属性多使用private/protected限定](#对象属性多使用privateprotected限定)
-  5. [类](#类)
+  6. [类](#类)
      * [组合优于继承](#组合优于继承)
      * [避免连贯接口](#避免连贯接口)
-  6. [类的SOLID原则 SOLID](#solid)
+  7. [类的SOLID原则 SOLID](#solid)
      * [S: 职责单一原则 Single Responsibility Principle (SRP)](#职责单一原则-single-responsibility-principle-srp)
      * [O: 开闭原则 Open/Closed Principle (OCP)](#开闭原则-openclosed-principle-ocp)
      * [L: 里氏替换原则 Liskov Substitution Principle (LSP)](#里氏替换原则-liskov-substitution-principle-lsp)
      * [I: 接口隔离原则 Interface Segregation Principle (ISP)](#接口隔离原则-interface-segregation-principle-isp)
      * [D: 依赖反转原则 Dependency Inversion Principle (DIP)](#依赖反转原则-dependency-inversion-principle-dip)
-  7. [别写重复代码 (DRY)](#别写重复代码-dry)
-  8. [翻译](#翻译)
+  8. [别写重复代码 (DRY)](#别写重复代码-dry)
+  9. [翻译](#翻译)
 
 ## 介绍
 
@@ -120,7 +122,6 @@ $result = $serializer->serialize($data, 448);
 $json = $serializer->serialize($data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 ```
 
-
 ### 使用便于搜索的名称 (part 2)
 
 **坏:**
@@ -139,7 +140,7 @@ class User
 {
     const ACCESS_READ = 1;
     const ACCESS_CREATE = 2;
-    const ACCESS_UPDATE = 4;
+    const ACCESS_UPDATE = 4;
     const ACCESS_DELETE = 8;
 }
 
@@ -378,7 +379,7 @@ function createMicrobrewery($name = null): void
 
 **好:**
 
-If you support only PHP 7+, then you can use [type hinting](http://php.net/manual/en/functions.arguments.php#functions.arguments.type-declaration) and be sure that the `$breweryName` will not be `NULL`.
+如果你的程序只支持 PHP 7+, 那你可以用 [type hinting](http://php.net/manual/en/functions.arguments.php#functions.arguments.type-declaration) 保证变量 `$breweryName` 不是 `NULL`.
 
 ```php
 function createMicrobrewery(string $breweryName = 'Hipster Brew Co.'): void
@@ -386,6 +387,39 @@ function createMicrobrewery(string $breweryName = 'Hipster Brew Co.'): void
     // ...
 }
 ```
+
+**[⬆ 返回顶部](#目录)**
+
+## Comparison
+
+### Use [identical comparison](http://php.net/manual/en/language.operators.comparison.php)
+
+**不好:**
+
+```php
+$a = '42';
+$b = 42;
+
+// 简易对比会将字符串转为整形
+
+if( $a != $b ) {
+   //这里始终执行不到
+}
+
+```
+对比 $a != $b 返回了 false 但应该返回 true !
+字符串 '42' 跟整数 42 不相等
+
+**好:**
+
+使用恒等判断检查类型和数据
+```php
+if( $a !== $b ) {
+    //The expression is verified
+}
+```
+
+The comparison $a !== $b return true.
 
 **[⬆ 返回顶部](#目录)**
 
@@ -1279,6 +1313,10 @@ class Employee
 
 [连贯接口Fluent interface](https://en.wikipedia.org/wiki/Fluent_interface)是一种
 旨在提高面向对象编程时代码可读性的API设计模式，他基于[方法链Method chaining](https://en.wikipedia.org/wiki/Method_chaining)
+
+有上下文的地方可以降低代码复杂度，例如[PHPUnit Mock Builder](https://phpunit.de/manual/current/en/test-doubles.html)
+和[Doctrine Query Builder](http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/query-builder.html)
+，更多的情况会带来较大代价：
 
 While there can be some contexts, frequently builder objects, where this
 pattern reduces the verbosity of the code (for example the [PHPUnit Mock Builder](https://phpunit.de/manual/current/en/test-doubles.html)
