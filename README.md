@@ -14,8 +14,8 @@
      * [少用无意义的变量名](#少用无意义的变量名)
      * [不要添加不必要上下文](#不要添加不必要上下文)
      * [合理使用参数默认值，没必要在方法里再做默认值检测](#合理使用参数默认值没必要在方法里再做默认值检测)
-  3. [Comparison](#comparison)
-     * [Use identical comparison](#use-identical-comparison)
+  3. [表达式](#表达式)
+     * [使用恒等式](#使用恒等式)
   4. [函数](#函数)
      * [函数参数（最好少于2个）](#函数参数-最好少于2个)
      * [函数应该只做一件事](#函数应该只做一件事)
@@ -37,7 +37,7 @@
   6. [类](#类)
      * [组合优于继承](#组合优于继承)
      * [避免连贯接口](#避免连贯接口)
-     * [Prefer `final` classes](#prefer-final-classes)
+     * [推荐使用 final 类](#推荐使用-final-类)
   7. [类的SOLID原则 SOLID](#solid)
      * [S: 职责单一原则 Single Responsibility Principle (SRP)](#职责单一原则-single-responsibility-principle-srp)
      * [O: 开闭原则 Open/Closed Principle (OCP)](#开闭原则-openclosed-principle-ocp)
@@ -390,9 +390,9 @@ function createMicrobrewery(string $breweryName = 'Hipster Brew Co.'): void
 
 **[⬆ 返回顶部](#目录)**
 
-## Comparison
+## 表达式
 
-### Use [identical comparison](http://php.net/manual/en/language.operators.comparison.php)
+### [使用恒等式](http://php.net/manual/en/language.operators.comparison.php)
 
 **不好:**
 
@@ -1420,15 +1420,15 @@ $car->dump();
 
 **[⬆ 返回顶部](#目录)**
 
-### Prefer final classes
+### 推荐使用 final 类
 
-The `final` should be used whenever possible:
+能用时尽量使用 `final` 关键字:
 
-1. It prevents uncontrolled inheritance chain.
-2. It encourages [composition](#prefer-composition-over-inheritance).
-3. It encourages the [Single Responsibility Pattern](#single-responsibility-principle-srp).
-4. It encourages developers to use your public methods instead of extending the class to get access on protected ones.
-5. It allows you to change your code without any break of applications that use your class.
+1. 阻止不受控的继承链
+2. 鼓励 [组合](#prefer-composition-over-inheritance).
+3. 鼓励 [单一职责模式](#single-responsibility-principle-srp).
+4. 鼓励开发者用你的公开方法而非通过继承类获取受保护方法的访问权限.
+5. 使得在不破坏使用你的类的应用的情况下修改代码成为可能.
 
 The only condition is that your class should implement an interface and no other public methods are defined.
 
@@ -1755,11 +1755,11 @@ foreach ($rectangles as $rectangle) {
 
 **好:**
 
-The best way is separate the quadrangles and allocation of a more general subtype for both shapes.
+最好是将这两种四边形分别对待，用一个适合两种类型的更通用子类型来代替。
 
-Despite the apparent similarity of the square and the rectangle, they are different.
-A square has much in common with a rhombus, and a rectangle with a parallelogram, but they are not subtype.
-A square, a rectangle, a rhombus and a parallelogram are separate shapes with their own properties, albeit similar.
+尽管正方形和长方形看起来很相似，但他们是不同的。
+正方形更接近菱形，而长方形更接近平行四边形。但他们不是子类型。
+尽管相似，正方形、长方形、菱形、平行四边形都是有自己属性的不同形状。
 
 ```php
 interface Shape
