@@ -6,17 +6,16 @@
   2. [变量](#变量)
      * [使用见字知意的变量名](#使用见字知意的变量名)
      * [同一个实体要用相同的变量名](#同一个实体要用相同的变量名)
-     * [使用便于搜索的名称 (part 1)](#使用便于搜索的名称part-1)
-     * [使用便于搜索的名称 (part 2)](#使用便于搜索的名称part-2)
-     * [使用自解释型变量](#使用自解释型变量)
+     * [使用便于搜索的名称 (part 1)](#使用便于搜索的名称-part-1)
+     * [使用便于搜索的名称 (part 2)](#使用便于搜索的名称-part-2)
      * [使用自解释型变量](#使用自解释型变量)
      * [避免深层嵌套，尽早返回 (part 1)](#避免深层嵌套尽早返回-part-1)
      * [避免深层嵌套，尽早返回 (part 2)](#避免深层嵌套尽早返回-part-2)
      * [少用无意义的变量名](#少用无意义的变量名)
      * [不要添加不必要上下文](#不要添加不必要上下文)
      * [合理使用参数默认值，没必要在方法里再做默认值检测](#合理使用参数默认值没必要在方法里再做默认值检测)
-  3. [Comparaison](#comparaison)
-     * [Use identical comparison](#identical_comparison)
+  3. [Comparison](#comparison)
+     * [Use identical comparison](#use-identical-comparison)
   4. [函数](#函数)
      * [函数参数（最好少于2个）](#函数参数-最好少于2个)
      * [函数应该只做一件事](#函数应该只做一件事)
@@ -38,6 +37,7 @@
   6. [类](#类)
      * [组合优于继承](#组合优于继承)
      * [避免连贯接口](#避免连贯接口)
+     * [Prefer `final` classes](#prefer-final-classes)
   7. [类的SOLID原则 SOLID](#solid)
      * [S: 职责单一原则 Single Responsibility Principle (SRP)](#职责单一原则-single-responsibility-principle-srp)
      * [O: 开闭原则 Open/Closed Principle (OCP)](#开闭原则-openclosed-principle-ocp)
@@ -396,30 +396,34 @@ function createMicrobrewery(string $breweryName = 'Hipster Brew Co.'): void
 
 **不好:**
 
+简易对比会将字符串转为整形
+
 ```php
 $a = '42';
 $b = 42;
 
-// 简易对比会将字符串转为整形
-
 if( $a != $b ) {
    //这里始终执行不到
 }
-
 ```
-对比 $a != $b 返回了 false 但应该返回 true !
+
+对比 $a != $b 返回了 `FALSE` 但应该返回 `TRUE` !
 字符串 '42' 跟整数 42 不相等
 
 **好:**
 
 使用恒等判断检查类型和数据
+
 ```php
-if( $a !== $b ) {
-    //The expression is verified
+$a = '42';
+$b = 42;
+
+if ($a !== $b) {
+    // The expression is verified
 }
 ```
 
-The comparison $a !== $b return true.
+The comparison `$a !== $b` returns `TRUE`.
 
 **[⬆ 返回顶部](#目录)**
 
@@ -1416,6 +1420,74 @@ $car->dump();
 
 **[⬆ 返回顶部](#目录)**
 
+### Prefer final classes
+
+The `final` should be used whenever possible:
+
+1. It prevents uncontrolled inheritance chain.
+2. It encourages [composition](#prefer-composition-over-inheritance).
+3. It encourages the [Single Responsibility Pattern](#single-responsibility-principle-srp).
+4. It encourages developers to use your public methods instead of extending the class to get access on protected ones.
+5. It allows you to change your code without any break of applications that use your class.
+
+The only condition is that your class should implement an interface and no other public methods are defined.
+
+For more informations you can read [the blog post](https://ocramius.github.io/blog/when-to-declare-classes-final/) on this topic written by [Marco Pivetta (Ocramius)](https://ocramius.github.io/).
+
+**Bad:**
+
+```php
+final class Car
+{
+    private $color;
+    
+    public function __construct($color)
+    {
+        $this->color = $color;
+    }
+    
+    /**
+     * @return string The color of the vehicle
+     */
+    public function getColor() 
+    {
+        return $this->color;
+    }
+}
+```
+
+**Good:**
+
+```php
+interface Vehicle
+{
+    /**
+     * @return string The color of the vehicle
+     */
+    public function getColor();
+}
+
+final class Car implements Vehicle
+{
+    private $color;
+    
+    public function __construct($color)
+    {
+        $this->color = $color;
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function getColor() 
+    {
+        return $this->color;
+    }
+}
+```
+
+**[⬆ 返回顶部](#目录)**
+
 ## SOLID
 
 **SOLID** 是Michael Feathers推荐的便于记忆的首字母简写，它代表了Robert Martin命名的最重要的五个面对对象编码设计原则
@@ -1636,11 +1708,6 @@ class Rectangle
     protected $width = 0;
     protected $height = 0;
 
-    public function render(int $area): void
-    {
-        // ...
-    }
-
     public function setWidth(int $width): void
     {
         $this->width = $width;
@@ -1670,48 +1737,44 @@ class Square extends Rectangle
     }
 }
 
-/**
- * @param Rectangle[] $rectangles
- */
-function renderLargeRectangles(array $rectangles): void
+function printArea(Rectangle $rectangle): void
 {
-    foreach ($rectangles as $rectangle) {
-        $rectangle->setWidth(4);
-        $rectangle->setHeight(5);
-        $area = $rectangle->getArea(); // BAD: Will return 25 for Square. Should be 20.
-        $rectangle->render($area);
-    }
+    $rectangle->setWidth(4);
+    $rectangle->setHeight(5);
+ 
+    // BAD: Will return 25 for Square. Should be 20.
+    echo sprintf('%s has area %d.', get_class($rectangle), $rectangle->getArea()).PHP_EOL;
 }
 
-$rectangles = [new Rectangle(), new Rectangle(), new Square()];
-renderLargeRectangles($rectangles);
+$rectangles = [new Rectangle(), new Square()];
+
+foreach ($rectangles as $rectangle) {
+    printArea($rectangle);
+}
 ```
 
 **好:**
 
+The best way is separate the quadrangles and allocation of a more general subtype for both shapes.
+
+Despite the apparent similarity of the square and the rectangle, they are different.
+A square has much in common with a rhombus, and a rectangle with a parallelogram, but they are not subtype.
+A square, a rectangle, a rhombus and a parallelogram are separate shapes with their own properties, albeit similar.
+
 ```php
-abstract class Shape
+interface Shape
 {
-    protected $width = 0;
-    protected $height = 0;
-
-    abstract public function getArea(): int;
-
-    public function render(int $area): void
-    {
-        // ...
-    }
+    public function getArea(): int;
 }
 
-class Rectangle extends Shape
+class Rectangle implements Shape
 {
-    public function setWidth(int $width): void
+    private $width = 0;
+    private $height = 0;
+
+    public function __construct(int $width, int $height)
     {
         $this->width = $width;
-    }
-
-    public function setHeight(int $height): void
-    {
         $this->height = $height;
     }
 
@@ -1721,41 +1784,31 @@ class Rectangle extends Shape
     }
 }
 
-class Square extends Shape
+class Square implements Shape
 {
     private $length = 0;
 
-    public function setLength(int $length): void
+    public function __construct(int $length)
     {
         $this->length = $length;
     }
 
     public function getArea(): int
     {
-        return pow($this->length, 2);
-    }
+        return $this->length ** 2;
+    }
 }
 
-/**
- * @param Rectangle[] $rectangles
- */
-function renderLargeRectangles(array $rectangles): void
+function printArea(Shape $shape): void
 {
-    foreach ($rectangles as $rectangle) {
-        if ($rectangle instanceof Square) {
-            $rectangle->setLength(5);
-        } elseif ($rectangle instanceof Rectangle) {
-            $rectangle->setWidth(4);
-            $rectangle->setHeight(5);
-        }
-
-        $area = $rectangle->getArea(); 
-        $rectangle->render($area);
-    }
+    echo sprintf('%s has area %d.', get_class($shape), $shape->getArea()).PHP_EOL;
 }
 
-$shapes = [new Rectangle(), new Rectangle(), new Square()];
-renderLargeRectangles($shapes);
+$shapes = [new Rectangle(4, 5), new Square(5)];
+
+foreach ($shapes as $shape) {
+    printArea($shape);
+}
 ```
 
 **[⬆ 返回顶部](#目录)**
@@ -2051,5 +2104,9 @@ function showList(array $employees): void
    * [panuwizzle/clean-code-php](https://github.com/panuwizzle/clean-code-php)
 * :fr: **French:**
    * [errorname/clean-code-php](https://github.com/errorname/clean-code-php)
+* :vietnam: **Vietnamese**
+   * [viethuongdev/clean-code-php](https://github.com/viethuongdev/clean-code-php)
+* :kr: **Korean:**
+   * [yujineeee/clean-code-php](https://github.com/yujineeee/clean-code-php)
    
 **[⬆ 返回顶部](#目录)**
