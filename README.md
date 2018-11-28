@@ -19,7 +19,7 @@
   4. [函数](#函数)
      * [函数参数（最好少于2个）](#函数参数-最好少于2个)
      * [函数应该只做一件事](#函数应该只做一件事)
-     * [函数名应该是有意义的动词（或表明具体做了什么事）](#函数名应该是有意义的动词或表明具体做了什么事)
+     * [函数名应体现他做了什么事](#函数名应体现他做了什么事)
      * [函数里应当只有一层抽象abstraction](#函数里应当只有一层抽象abstraction)
      * [不要用flag作为函数的参数](#不要用flag作为函数的参数)
      * [避免副作用](#避免副作用)
@@ -33,17 +33,17 @@
      * [移除僵尸代码](#移除僵尸代码)
   5. [对象和数据结构 Objects and Data Structures](#对象和数据结构)
      * [使用 getters 和 setters Use object encapsulation](#使用-getters-和-setters)
-     * [对象属性多使用private/protected限定](#对象属性多使用privateprotected限定)
+     * [给对象使用私有或受保护的成员变量](#给对象使用私有或受保护的成员变量)
   6. [类](#类)
-     * [组合优于继承](#组合优于继承)
+     * [少用继承多用组合](#少用继承多用组合)
      * [避免连贯接口](#避免连贯接口)
      * [推荐使用 final 类](#推荐使用-final-类)
   7. [类的SOLID原则 SOLID](#solid)
-     * [S: 职责单一原则 Single Responsibility Principle (SRP)](#职责单一原则-single-responsibility-principle-srp)
-     * [O: 开闭原则 Open/Closed Principle (OCP)](#开闭原则-openclosed-principle-ocp)
-     * [L: 里氏替换原则 Liskov Substitution Principle (LSP)](#里氏替换原则-liskov-substitution-principle-lsp)
-     * [I: 接口隔离原则 Interface Segregation Principle (ISP)](#接口隔离原则-interface-segregation-principle-isp)
-     * [D: 依赖反转原则 Dependency Inversion Principle (DIP)](#依赖反转原则-dependency-inversion-principle-dip)
+     * [S: 单一职责原则 Single Responsibility Principle (SRP)](#单一职责原则)
+     * [O: 开闭原则 Open/Closed Principle (OCP)](#开闭原则)
+     * [L: 里氏替换原则 Liskov Substitution Principle (LSP)](#里氏替换原则)
+     * [I: 接口隔离原则 Interface Segregation Principle (ISP)](#接口隔离原则)
+     * [D: 依赖倒置原则 Dependency Inversion Principle (DIP)](#依赖倒置原则)
   8. [别写重复代码 (DRY)](#别写重复代码-dry)
   9. [翻译](#翻译)
 
@@ -427,7 +427,7 @@ The comparison `$a !== $b` returns `TRUE`.
 
 **[⬆ 返回顶部](#目录)**
 
-## **函数**
+## 函数
 
 ### 函数参数（最好少于2个）
 
@@ -511,7 +511,7 @@ function isClientActive(int $client): bool
 
 **[⬆ 返回顶部](#目录)**
 
-### 函数名应该是有意义的动词（或表明具体做了什么事）
+### 函数名应体现他做了什么事
 
 **坏:**
 
@@ -527,7 +527,7 @@ class Email
 }
 
 $message = new Email(...);
-// 啥？handle处理一个消息干嘛了？是往一个文件里写码？
+// 啥？handle处理一个消息干嘛了？是往一个文件里写吗？
 $message->handle();
 ```
 
@@ -690,8 +690,8 @@ class BetterJSAlternative
 
 **[⬆ 返回顶部](#目录)**
 
-
 ### 不要用flag作为函数的参数
+
 flag就是在告诉大家，这个方法里处理很多事。前面刚说过，一个函数应当只做一件事。 把不同flag的代码拆分到多个函数里。
 
 **坏:**
@@ -1108,7 +1108,7 @@ inventoryTracker('apples', $request, 'www.inventory-awesome.io');
 * 继承当前类时，可以复写默认的方法功能
 * 当对象属性是从远端服务器获取时，get*，set*易于使用延迟加载
 
-此外，这样的方式也符合OOP开发中的[开闭原则](#openclosed-principle-ocp)
+此外，这样的方式也符合OOP开发中的[开闭原则](#开闭原则)
 
 **坏:**
 
@@ -1167,7 +1167,7 @@ $balance = $bankAccount->getBalance();
 
 **[⬆ 返回顶部](#目录)**
 
-### 对象属性多使用private/protected限定
+### 给对象使用私有或受保护的成员变量
 
 * 对`public`方法和属性进行修改非常危险，因为外部代码容易依赖他，而你没办法控制。**对之修改影响所有这个类的使用者。** `public` methods and properties are most dangerous for changes, because some outside code may easily rely on them and you can't control what code relies on them. **Modifications in class are dangerous for all users of class.**
 * 对`protected`的修改跟对`public`修改差不多危险，因为他们对子类可用，他俩的唯一区别就是可调用的位置不一样，**对之修改影响所有集成这个类的地方。**  `protected` modifier are as dangerous as public, because they are available in scope of any child class. This effectively means that difference between public and protected is only in access mechanism, but encapsulation guarantee remains the same. **Modifications in class are dangerous for all descendant classes.**
@@ -1220,7 +1220,7 @@ echo 'Employee name: '.$employee->getName(); // Employee name: John Doe
 
 ## 类
 
-### 组合优于继承
+### 少用继承多用组合
 
 正如  the Gang of Four 所著的[*设计模式*](https://en.wikipedia.org/wiki/Design_Patterns)之前所说，
 我们应该尽量优先选择组合而不是继承的方式。使用继承和组合都有很多好处。
@@ -1252,8 +1252,8 @@ class Employee
 }
 
 
-// 不好，因为Employees "有" taxdata
-// 而EmployeeTaxData不是Employee类型的
+// 不好，因为 Employees "有" taxdata
+// 而 EmployeeTaxData 不是 Employee 类型的
 
 
 class EmployeeTaxData extends Employee 
@@ -1425,8 +1425,8 @@ $car->dump();
 能用时尽量使用 `final` 关键字:
 
 1. 阻止不受控的继承链
-2. 鼓励 [组合](#prefer-composition-over-inheritance).
-3. 鼓励 [单一职责模式](#single-responsibility-principle-srp).
+2. 鼓励 [组合](#少用继承多用组合).
+3. 鼓励 [单一职责模式](#单一职责模式).
 4. 鼓励开发者用你的公开方法而非通过继承类获取受保护方法的访问权限.
 5. 使得在不破坏使用你的类的应用的情况下修改代码成为可能.
 
@@ -1492,14 +1492,16 @@ final class Car implements Vehicle
 
 **SOLID** 是Michael Feathers推荐的便于记忆的首字母简写，它代表了Robert Martin命名的最重要的五个面对对象编码设计原则
 
- * [S: 职责单一原则 (SRP)](#职责单一原则-single-responsibility-principle-srp)
- * [O: 开闭原则 (OCP)](#开闭原则-openclosed-principle-ocp)
- * [L: 里氏替换原则 (LSP)](#里氏替换原则-liskov-substitution-principle-lsp)
- * [I: 接口隔离原则 (ISP)](#接口隔离原则-interface-segregation-principle-isp)
- * [D: 依赖反转原则 (DIP)](#依赖反转原则-dependency-inversion-principle-dip)
+ * [S: 单一职责原则 (SRP)](#职责原则)
+ * [O: 开闭原则 (OCP)](#开闭原则)
+ * [L: 里氏替换原则 (LSP)](#里氏替换原则)
+ * [I: 接口隔离原则 (ISP)](#接口隔离原则)
+ * [D: 依赖倒置原则 (DIP)](#依赖倒置原则)
 
 
-### 职责单一原则 Single Responsibility Principle (SRP)
+### 单一职责原则
+
+Single Responsibility Principle (SRP)
 
 正如在Clean Code所述，"修改一个类应该只为一个理由"。
 人们总是易于用一堆方法塞满一个类，如同我们只能在飞机上
@@ -1575,9 +1577,11 @@ class UserSettings
 
 **[⬆ 返回顶部](#目录)**
 
-### 开闭原则 Open/Closed Principle (OCP)
+### 开闭原则
 
-正如Bertrand Meyer所述，"软件的工件（classes, modules, functions,等）
+Open/Closed Principle (OCP)
+
+正如Bertrand Meyer所述，"软件的工件（ classes, modules, functions 等）
 应该对扩展开放，对修改关闭。" 然而这句话意味着什么呢？这个原则大体上表示你
 应该允许在不改变已有代码的情况下增加新的功能
 
@@ -1688,7 +1692,10 @@ class HttpRequester
 
 **[⬆ 返回顶部](#目录)**
 
-### 里氏替换原则 Liskov Substitution Principle (LSP)
+### 里氏替换原则
+
+Liskov Substitution Principle (LSP)
+
 这是一个简单的原则，却用了一个不好理解的术语。它的正式定义是
 "如果S是T的子类型，那么在不改变程序原有既定属性（检查、执行
 任务等）的前提下，任何T类型的对象都可以使用S类型的对象替代
@@ -1813,7 +1820,9 @@ foreach ($shapes as $shape) {
 
 **[⬆ 返回顶部](#目录)**
 
-### 接口隔离原则 Interface Segregation Principle (ISP)
+### 接口隔离原则
+
+Interface Segregation Principle (ISP)
 
 接口隔离原则表示："调用方不应该被强制依赖于他不需要的接口"
 
@@ -1831,7 +1840,7 @@ interface Employee
     public function eat(): void;
 }
 
-class Human implements Employee
+class HumanEmployee implements Employee
 {
     public function work(): void
     {
@@ -1844,7 +1853,7 @@ class Human implements Employee
     }
 }
 
-class Robot implements Employee
+class RobotEmployee implements Employee
 {
     public function work(): void
     {
@@ -1877,7 +1886,7 @@ interface Employee extends Feedable, Workable
 {
 }
 
-class Human implements Employee
+class HumanEmployee implements Employee
 {
     public function work(): void
     {
@@ -1891,7 +1900,7 @@ class Human implements Employee
 }
 
 // robot can only work
-class Robot implements Workable
+class RobotEmployee implements Workable
 {
     public function work(): void
     {
@@ -1902,16 +1911,18 @@ class Robot implements Workable
 
 **[⬆ 返回顶部](#目录)**
 
-### 依赖反转原则 Dependency Inversion Principle (DIP)
+### 依赖倒置原则
+
+Dependency Inversion Principle (DIP)
 
 这条原则说明两个基本的要点：
 1. 高阶的模块不应该依赖低阶的模块，它们都应该依赖于抽象
 2. 抽象不应该依赖于实现，实现应该依赖于抽象
 
-这条起初看起来有点晦涩难懂，但是如果你使用过php框架（例如 Symfony），你应该见过
-依赖注入（DI）对这个概念的实现。虽然它们不是完全相通的概念，依赖倒置原则使高阶模块
-与低阶模块的实现细节和创建分离。可以使用依赖注入（DI）这种方式来实现它。更多的好处
-是它使模块之间解耦。耦合会导致你难于重构，它是一种非常糟糕的的开发模式
+这条起初看起来有点晦涩难懂，但是如果你使用过 PHP 框架（例如 Symfony），你应该见过
+依赖注入（DI），它是对这个概念的实现。虽然它们不是完全相等的概念，依赖倒置原则使高阶模块
+与低阶模块的实现细节和创建分离。可以使用依赖注入（DI）这种方式来实现它。最大的好处
+是它使模块之间解耦。耦合会导致你难于重构，它是一种非常糟糕的的开发模式。
 
 **坏:**
 
@@ -2007,10 +2018,10 @@ class Manager
 分相同的方法，移除重复的代码意味着用一个function/module/class创
 建一个能处理差异的抽象。
 
-正确的抽象是非常关键的，这正是为什么你必须学习遵守在[Classes](#classes)章节展开
-的SOLID原则，不合理的抽象比复制代码更糟糕，所有务必谨慎！说到这么多，
-如果你能设计一个合理的抽象，实现它！不要重复，否则你会发现任何时候当你
-想修改一个逻辑时你必须修改多个地方。
+用对抽象非常关键，这正是为什么你必须学习遵守在[类](#类)章节写
+的SOLID原则，不合理的抽象比复制代码更糟糕，所以务必谨慎！说了这么多，
+如果你能设计一个合理的抽象，那就这么干！别写重复代码，否则你会发现
+任何时候当你想修改一个逻辑时你必须修改多个地方。
 
 **坏:**
 
@@ -2108,5 +2119,7 @@ function showList(array $employees): void
    * [viethuongdev/clean-code-php](https://github.com/viethuongdev/clean-code-php)
 * :kr: **Korean:**
    * [yujineeee/clean-code-php](https://github.com/yujineeee/clean-code-php)
+* :tr: **Turkish:**
+   * [anilozmen/clean-code-php](https://github.com/anilozmen/clean-code-php)
    
 **[⬆ 返回顶部](#目录)**
