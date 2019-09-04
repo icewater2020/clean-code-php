@@ -112,7 +112,7 @@ getUser();
 
 **坏:**
 ```php
-// What the heck is 448 for?
+// 448 ™ 干啥的?
 $result = $serializer->serialize($data, 448);
 ```
 
@@ -127,10 +127,19 @@ $json = $serializer->serialize($data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT
 **坏:**
 
 ```php
-// What the heck is 4 for?
+class User
+{
+    // 7 ™ 干啥的?
+    public $access = 7;
+}
+
+// 4 ™ 干啥的?
 if ($user->access & 4) {
     // ...
 }
+
+// 这里会发生什么?
+$user->access ^= 2;
 ```
 
 **好:**
@@ -142,11 +151,17 @@ class User
     const ACCESS_CREATE = 2;
     const ACCESS_UPDATE = 4;
     const ACCESS_DELETE = 8;
+
+    // 默认情况下用户 具有读、写和更新权限
+    public $access = self::ACCESS_READ | self::ACCESS_CREATE | self::ACCESS_UPDATE;
 }
 
 if ($user->access & User::ACCESS_UPDATE) {
     // do edit ...
 }
+
+// 禁用创建权限
+$user->access ^= User::ACCESS_CREATE;
 ```
 
 **[⬆ 返回顶部](#目录)**
@@ -271,7 +286,7 @@ function fibonacci(int $n): int
         return $n;
     }
 
-    if ($n > 50) {
+    if ($n >= 50) {
         throw new \Exception('Not supported');
     }
 
@@ -1020,7 +1035,7 @@ function travelToTexas($vehicle): void
 **好:**
 
 ```php
-function travelToTexas(Traveler $vehicle): void
+function travelToTexas(Vehicle $vehicle): void
 {
     $vehicle->travelTo(new Location('texas'));
 }
