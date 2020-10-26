@@ -61,7 +61,7 @@
 
 ## 翻译说明
 
-翻译完成度100%，最后更新时间2017-12-25。本文由 php-cpm 基于 [yangweijie版本](https://github.com/yangweijie/clean-code-php) 的[clean-code-php](https://github.com/jupeter/clean-code-php)翻译并同步大量原文内容。
+翻译完成度100%，最后更新时间2020-10-26。本文由 php-cpm 基于 [yangweijie版本](https://github.com/yangweijie/clean-code-php) 的[clean-code-php](https://github.com/jupeter/clean-code-php)翻译并同步大量原文内容。
 
 原文更新频率较高，我的翻译方法是直接用文本比较工具逐行对比。优先保证文字内容是最新的，再逐步提升翻译质量。
 
@@ -147,10 +147,10 @@ $user->access ^= 2;
 ```php
 class User
 {
-    const ACCESS_READ = 1;
-    const ACCESS_CREATE = 2;
-    const ACCESS_UPDATE = 4;
-    const ACCESS_DELETE = 8;
+    public const ACCESS_READ = 1;
+    public const ACCESS_CREATE = 2;
+    public const ACCESS_UPDATE = 4;
+    public const ACCESS_DELETE = 8;
 
     // 默认情况下用户 具有读、写和更新权限
     public $access = self::ACCESS_READ | self::ACCESS_CREATE | self::ACCESS_UPDATE;
@@ -442,6 +442,29 @@ The comparison `$a !== $b` returns `TRUE`.
 
 **[⬆ 返回顶部](#目录)**
 
+### Null coalescing operator
+
+Null coalescing is a new operator [introduced in PHP 7](https://www.php.net/manual/en/migration70.new-features.php). The null coalescing operator `??` has been added as syntactic sugar for the common case of needing to use a ternary in conjunction with `isset()`. It returns its first operand if it exists and is not `null`; otherwise it returns its second operand.
+
+**Bad:**
+
+```php
+if (isset($_GET['name'])) {
+    $name = $_GET['name'];
+} elseif (isset($_POST['name'])) {
+    $name = $_POST['name'];
+} else {
+    $name = 'nobody';
+}
+```
+
+**Good:**
+```php
+$name = $_GET['name'] ?? $_POST['name'] ?? 'nobody';
+```
+
+**[⬆ back to top](#table-of-contents)**
+
 ## 函数
 
 ### 函数参数（最好少于2个）
@@ -453,51 +476,19 @@ The comparison `$a !== $b` returns `TRUE`.
 **坏:**
 
 ```php
-function createMenu(string $title, string $body, string $buttonText, bool $cancellable): void
+class Questionnaire
 {
-    // ...
-}
-```
-
-**好:**
-
-```php
-class MenuConfig
-{
-    public $title;
-    public $body;
-    public $buttonText;
-    public $cancellable = false;
-}
-
-$config = new MenuConfig();
-$config->title = 'Foo';
-$config->body = 'Bar';
-$config->buttonText = 'Baz';
-$config->cancellable = true;
-
-function createMenu(MenuConfig $config): void
-{
-    // ...
-}
-```
-
-**[⬆ 返回顶部](#目录)**
-
-### 函数应该只做一件事
-
-这是迄今为止软件工程里最重要的一个规则。当一个函数做超过一件事的时候，他们就难于实现、测试和理解。当你把一个函数拆分到只剩一个功能时，他们就容易被重构，然后你的代码读起来就更清晰。如果你光遵循这条规则，你就领先于大多数开发者了。
-
-**坏:**
-
-```php
-function emailClients(array $clients): void
-{
-    foreach ($clients as $client) {
-        $clientRecord = $db->find($client);
-        if ($clientRecord->isActive()) {
-            email($client);
-        }
+    public function __construct(
+        string $firstname,
+        string $lastname,
+        string $patronymic,
+        string $region,
+        string $district,
+        string $city,
+        string $phone,
+        string $email
+    ) {
+        // ...
     }
 }
 ```
@@ -505,22 +496,58 @@ function emailClients(array $clients): void
 **好:**
 
 ```php
-function emailClients(array $clients): void
+class Name
 {
-    $activeClients = activeClients($clients);
-    array_walk($activeClients, 'email');
+    private $firstname;
+    private $lastname;
+    private $patronymic;
+
+    public function __construct(string $firstname, string $lastname, string $patronymic)
+    {
+        $this->firstname = $firstname;
+        $this->lastname = $lastname;
+        $this->patronymic = $patronymic;
+    }
+
+    // getters ...
 }
 
-function activeClients(array $clients): array
+class City
 {
-    return array_filter($clients, 'isClientActive');
+    private $region;
+    private $district;
+    private $city;
+
+    public function __construct(string $region, string $district, string $city)
+    {
+        $this->region = $region;
+        $this->district = $district;
+        $this->city = $city;
+    }
+
+    // getters ...
 }
 
-function isClientActive(int $client): bool
+class Contact
 {
-    $clientRecord = $db->find($client);
+    private $phone;
+    private $email;
 
-    return $clientRecord->isActive();
+    public function __construct(string $phone, string $email)
+    {
+        $this->phone = $phone;
+        $this->email = $email;
+    }
+
+    // getters ...
+}
+
+class Questionnaire
+{
+    public function __construct(Name $name, City $city, Contact $contact)
+    {
+        // ...
+    }
 }
 ```
 
@@ -574,7 +601,7 @@ $message->send();
 **坏:**
 
 ```php
-function parseBetterJSAlternative(string $code): void
+function parseBetterPHPAlternative(string $code): void
 {
     $regexes = [
         // ...
@@ -631,7 +658,7 @@ function lexer(array $tokens): array
     return $ast;
 }
 
-function parseBetterJSAlternative(string $code): void
+function parseBetterPHPAlternative(string $code): void
 {
     $tokens = tokenize($code);
     $ast = lexer($tokens);
@@ -643,7 +670,7 @@ function parseBetterJSAlternative(string $code): void
 
 **好:**
 
-最好的解决方案是把 `parseBetterJSAlternative()`方法的依赖移除。
+最好的解决方案是把 `parseBetterPHPAlternative()`方法的依赖移除。
 
 ```php
 class Tokenizer
@@ -679,7 +706,7 @@ class Lexer
     }
 }
 
-class BetterJSAlternative
+class BetterPHPAlternative
 {
     private $tokenizer;
     private $lexer;
@@ -700,8 +727,6 @@ class BetterJSAlternative
     }
 }
 ```
-
-这样我们可以对依赖做mock，并测试`BetterJSAlternative::parse()`运行是否符合预期。
 
 **[⬆ 返回顶部](#目录)**
 
@@ -811,7 +836,8 @@ class Configuration
 
     public function get(string $key): ?string
     {
-        return isset($this->configuration[$key]) ? $this->configuration[$key] : null;
+        // null coalescing operator 
+        return $this->configuration[$key] ?? null;
     }
 }
 ```
@@ -1252,7 +1278,7 @@ echo 'Employee name: '.$employee->getName(); // Employee name: John Doe
 **糟糕的:**
 
 ```php
-class Employee 
+class Employee
 {
     private $name;
     private $email;
@@ -1271,11 +1297,11 @@ class Employee
 // 而 EmployeeTaxData 不是 Employee 类型的
 
 
-class EmployeeTaxData extends Employee 
+class EmployeeTaxData extends Employee
 {
     private $ssn;
     private $salary;
-    
+
     public function __construct(string $name, string $email, string $ssn, string $salary)
     {
         parent::__construct($name, $email);
@@ -1291,7 +1317,7 @@ class EmployeeTaxData extends Employee
 **好:**
 
 ```php
-class EmployeeTaxData 
+class EmployeeTaxData
 {
     private $ssn;
     private $salary;
@@ -1305,7 +1331,7 @@ class EmployeeTaxData
     // ...
 }
 
-class Employee 
+class Employee
 {
     private $name;
     private $email;
@@ -1317,9 +1343,9 @@ class Employee
         $this->email = $email;
     }
 
-    public function setTaxData(string $ssn, string $salary)
+    public function setTaxData(EmployeeTaxData $taxData)
     {
-        $this->taxData = new EmployeeTaxData($ssn, $salary);
+        $this->taxData = $taxData;
     }
 
     // ...
@@ -1455,16 +1481,16 @@ For more informations you can read [the blog post](https://ocramius.github.io/bl
 final class Car
 {
     private $color;
-    
+
     public function __construct($color)
     {
         $this->color = $color;
     }
-    
+
     /**
      * @return string The color of the vehicle
      */
-    public function getColor() 
+    public function getColor()
     {
         return $this->color;
     }
@@ -1485,16 +1511,16 @@ interface Vehicle
 final class Car implements Vehicle
 {
     private $color;
-    
+
     public function __construct($color)
     {
         $this->color = $color;
     }
-    
+
     /**
      * {@inheritdoc}
      */
-    public function getColor() 
+    public function getColor()
     {
         return $this->color;
     }
@@ -1555,7 +1581,7 @@ class UserSettings
 **好:**
 
 ```php
-class UserAuth 
+class UserAuth
 {
     private $user;
 
@@ -1563,19 +1589,19 @@ class UserAuth
     {
         $this->user = $user;
     }
-    
+
     public function verifyCredentials(): bool
     {
         // ...
     }
 }
 
-class UserSettings 
+class UserSettings
 {
     private $user;
     private $auth;
 
-    public function __construct(User $user) 
+    public function __construct(User $user)
     {
         $this->user = $user;
         $this->auth = new UserAuth($user);
@@ -1763,7 +1789,7 @@ function printArea(Rectangle $rectangle): void
 {
     $rectangle->setWidth(4);
     $rectangle->setHeight(5);
- 
+
     // BAD: Will return 25 for Square. Should be 20.
     echo sprintf('%s has area %d.', get_class($rectangle), $rectangle->getArea()).PHP_EOL;
 }
@@ -2136,5 +2162,5 @@ function showList(array $employees): void
    * [yujineeee/clean-code-php](https://github.com/yujineeee/clean-code-php)
 * :tr: **Turkish:**
    * [anilozmen/clean-code-php](https://github.com/anilozmen/clean-code-php)
-   
+
 **[⬆ 返回顶部](#目录)**
