@@ -12,11 +12,11 @@
      * [避免深层嵌套，尽早返回 (part 1)](#避免深层嵌套尽早返回-part-1)
      * [避免深层嵌套，尽早返回 (part 2)](#避免深层嵌套尽早返回-part-2)
      * [少用无意义的变量名](#少用无意义的变量名)
-     * [不要添加不必要上下文](#不要添加不必要上下文)
-     * [合理使用参数默认值，没必要在方法里再做默认值检测](#合理使用参数默认值没必要在方法里再做默认值检测)
-  3. [表达式](#表达式)
+     * [不要添加不必要上下文](#不要添加不必要上下文)  3. [表达式](#表达式)
      * [使用恒等式](#使用恒等式)
+     * [Null合并运算符](#null合并运算符)
   4. [函数](#函数)
+     * [合理使用参数默认值，没必要在方法里再做默认值检测](#合理使用参数默认值没必要在方法里再做默认值检测)
      * [函数参数（最好少于2个）](#函数参数-最好少于2个)
      * [函数应该只做一件事](#函数应该只做一件事)
      * [函数名应体现他做了什么事](#函数名应体现他做了什么事)
@@ -148,8 +148,11 @@ $user->access ^= 2;
 class User
 {
     public const ACCESS_READ = 1;
+
     public const ACCESS_CREATE = 2;
+
     public const ACCESS_UPDATE = 4;
+
     public const ACCESS_DELETE = 8;
 
     // 默认情况下用户 具有读、写和更新权限
@@ -223,15 +226,12 @@ function isShopOpen($day): bool
                 return true;
             } elseif ($day === 'sunday') {
                 return true;
-            } else {
-                return false;
             }
-        } else {
             return false;
         }
-    } else {
         return false;
     }
+    return false;
 }
 ```
 
@@ -244,9 +244,7 @@ function isShopOpen(string $day): bool
         return false;
     }
 
-    $openingDays = [
-        'friday', 'saturday', 'sunday'
-    ];
+    $openingDays = ['friday', 'saturday', 'sunday'];
 
     return in_array(strtolower($day), $openingDays, true);
 }
@@ -265,15 +263,12 @@ function fibonacci(int $n)
         if ($n !== 0) {
             if ($n !== 1) {
                 return fibonacci($n - 1) + fibonacci($n - 2);
-            } else {
-                return 1;
             }
-        } else {
-            return 0;
+            return 1;
         }
-    } else {
-        return 'Not supported';
+        return 0;
     }
+    return 'Not supported';
 }
 ```
 
@@ -287,7 +282,7 @@ function fibonacci(int $n): int
     }
 
     if ($n >= 50) {
-        throw new \Exception('Not supported');
+        throw new Exception('Not supported');
     }
 
     return fibonacci($n - 1) + fibonacci($n - 2);
@@ -345,7 +340,9 @@ foreach ($locations as $location) {
 class Car
 {
     public $carMake;
+
     public $carModel;
+
     public $carColor;
 
     //...
@@ -358,7 +355,9 @@ class Car
 class Car
 {
     public $make;
+
     public $model;
+
     public $color;
 
     //...
@@ -367,43 +366,6 @@ class Car
 
 **[⬆ 返回顶部](#目录)**
 
-### 合理使用参数默认值，没必要在方法里再做默认值检测
-
-**不好:**
-
-不好，`$breweryName` 可能为 `NULL`.
-
-```php
-function createMicrobrewery($breweryName = 'Hipster Brew Co.'): void
-{
-    // ...
-}
-```
-
-**还行:**
-
-比上一个好理解一些，但最好能控制变量的值
-
-```php
-function createMicrobrewery($name = null): void
-{
-    $breweryName = $name ?: 'Hipster Brew Co.';
-    // ...
-}
-```
-
-**好:**
-
-如果你的程序只支持 PHP 7+, 那你可以用 [type hinting](http://php.net/manual/en/functions.arguments.php#functions.arguments.type-declaration) 保证变量 `$breweryName` 不是 `NULL`.
-
-```php
-function createMicrobrewery(string $breweryName = 'Hipster Brew Co.'): void
-{
-    // ...
-}
-```
-
-**[⬆ 返回顶部](#目录)**
 
 ## 表达式
 
@@ -417,7 +379,7 @@ function createMicrobrewery(string $breweryName = 'Hipster Brew Co.'): void
 $a = '42';
 $b = 42;
 
-if( $a != $b ) {
+if ($a != $b) {
    //这里始终执行不到
 }
 ```
@@ -442,11 +404,11 @@ The comparison `$a !== $b` returns `TRUE`.
 
 **[⬆ 返回顶部](#目录)**
 
-### Null coalescing operator
+### Null合并运算符
 
-Null coalescing is a new operator [introduced in PHP 7](https://www.php.net/manual/en/migration70.new-features.php). The null coalescing operator `??` has been added as syntactic sugar for the common case of needing to use a ternary in conjunction with `isset()`. It returns its first operand if it exists and is not `null`; otherwise it returns its second operand.
+Null合并运算符是 [PHP 7新特性](https://www.php.net/manual/en/migration70.new-features.php). Null合并运算符 `??` 是用来简化判断`isset()`的语法糖。如果第一个操作数存在且不为`null`则返回；否则返回第二个操作数。
 
-**Bad:**
+**不好:**
 
 ```php
 if (isset($_GET['name'])) {
@@ -458,14 +420,53 @@ if (isset($_GET['name'])) {
 }
 ```
 
-**Good:**
+**好:**
 ```php
 $name = $_GET['name'] ?? $_POST['name'] ?? 'nobody';
 ```
 
-**[⬆ back to top](#table-of-contents)**
+**[⬆ 返回顶部](#目录)**
+
 
 ## 函数
+
+### 合理使用参数默认值，没必要在方法里再做默认值检测
+
+**不好:**
+
+不好，`$breweryName` 可能为 `NULL`.
+
+```php
+function createMicrobrewery($breweryName = 'Hipster Brew Co.'): void
+{
+    // ...
+}
+```
+
+**还行:**
+
+比上一个好理解一些，但最好能控制变量的值
+
+```php
+function createMicrobrewery($name = null): void
+{
+    $breweryName = $name ?: 'Hipster Brew Co.';
+    // ...
+}
+```
+
+**好:**
+
+如果你的程序只支持 PHP 7+, 那你可以用 [type hinting](http://php.net/manual/en/functions.arguments.php#functions.arguments.type-declaration) 保证变量 `$breweryName` 不是 `NULL`.
+
+```php
+function createMicrobrewery(string $breweryName = 'Hipster Brew Co.'): void
+{
+    // ...
+}
+```
+
+**[⬆ 返回顶部](#目录)**
 
 ### 函数参数（最好少于2个）
 
@@ -499,7 +500,9 @@ class Questionnaire
 class Name
 {
     private $firstname;
+
     private $lastname;
+
     private $patronymic;
 
     public function __construct(string $firstname, string $lastname, string $patronymic)
@@ -515,7 +518,9 @@ class Name
 class City
 {
     private $region;
+
     private $district;
+
     private $city;
 
     public function __construct(string $region, string $district, string $city)
@@ -531,6 +536,7 @@ class City
 class Contact
 {
     private $phone;
+
     private $email;
 
     public function __construct(string $phone, string $email)
@@ -576,7 +582,7 @@ $message->handle();
 **好:**
 
 ```php
-class Email 
+class Email
 {
     //...
 
@@ -739,7 +745,7 @@ flag就是在告诉大家，这个方法里处理很多事。前面刚说过，�
 function createFile(string $name, bool $temp = false): void
 {
     if ($temp) {
-        touch('./temp/'.$name);
+        touch('./temp/' . $name);
     } else {
         touch($name);
     }
@@ -756,7 +762,7 @@ function createFile(string $name): void
 
 function createTempFile(string $name): void
 {
-    touch('./temp/'.$name);
+    touch('./temp/' . $name);
 }
 ```
 **[⬆ 返回顶部](#目录)**
@@ -785,7 +791,8 @@ function splitIntoFirstAndLastName(): void
 
 splitIntoFirstAndLastName();
 
-var_dump($name); // ['Ryan', 'McDermott'];
+var_dump($name);
+// ['Ryan', 'McDermott'];
 ```
 
 **好:**
@@ -799,8 +806,11 @@ function splitIntoFirstAndLastName(string $name): array
 $name = 'Ryan McDermott';
 $newName = splitIntoFirstAndLastName($name);
 
-var_dump($name); // 'Ryan McDermott';
-var_dump($newName); // ['Ryan', 'McDermott'];
+var_dump($name);
+// 'Ryan McDermott';
+
+var_dump($newName);
+// ['Ryan', 'McDermott'];
 ```
 
 **[⬆ 返回顶部](#目录)**
@@ -816,9 +826,9 @@ var_dump($newName); // ['Ryan', 'McDermott'];
 ```php
 function config(): array
 {
-    return  [
+    return [
         'foo' => 'bar',
-    ]
+    ];
 }
 ```
 
@@ -836,7 +846,7 @@ class Configuration
 
     public function get(string $key): ?string
     {
-        // null coalescing operator 
+        // null coalescing operator
         return $this->configuration[$key] ?? null;
     }
 }
@@ -876,7 +886,7 @@ class DBConnection
         // ...
     }
 
-    public static function getInstance(): DBConnection
+    public static function getInstance(): self
     {
         if (self::$instance === null) {
             self::$instance = new self();
@@ -901,7 +911,7 @@ class DBConnection
         // ...
     }
 
-     // ...
+    // ...
 }
 ```
 
@@ -940,13 +950,12 @@ if ($article->isPublished()) {
 **坏:**
 
 ```php
-function isDOMNodeNotPresent(\DOMNode $node): bool
+function isDOMNodeNotPresent(DOMNode $node): bool
 {
     // ...
 }
 
-if (!isDOMNodeNotPresent($node))
-{
+if (! isDOMNodeNotPresent($node)) {
     // ...
 }
 ```
@@ -954,7 +963,7 @@ if (!isDOMNodeNotPresent($node))
 **好:**
 
 ```php
-function isDOMNodePresent(\DOMNode $node): bool
+function isDOMNodePresent(DOMNode $node): bool
 {
     // ...
 }
@@ -1081,8 +1090,8 @@ function travelToTexas(Vehicle $vehicle): void
 ```php
 function combine($val1, $val2): int
 {
-    if (!is_numeric($val1) || !is_numeric($val2)) {
-        throw new \Exception('Must be of type Number');
+    if (! is_numeric($val1) || ! is_numeric($val2)) {
+        throw new Exception('Must be of type Number');
     }
 
     return $val1 + $val2;
@@ -1232,7 +1241,8 @@ class Employee
 }
 
 $employee = new Employee('John Doe');
-echo 'Employee name: '.$employee->name; // Employee name: John Doe
+// Employee name: John Doe
+echo 'Employee name: ' . $employee->name;
 ```
 
 **好:**
@@ -1254,7 +1264,8 @@ class Employee
 }
 
 $employee = new Employee('John Doe');
-echo 'Employee name: '.$employee->getName(); // Employee name: John Doe
+// Employee name: John Doe
+echo 'Employee name: ' . $employee->getName();
 ```
 
 **[⬆ 返回顶部](#目录)**
@@ -1281,6 +1292,7 @@ echo 'Employee name: '.$employee->getName(); // Employee name: John Doe
 class Employee
 {
     private $name;
+
     private $email;
 
     public function __construct(string $name, string $email)
@@ -1300,6 +1312,7 @@ class Employee
 class EmployeeTaxData extends Employee
 {
     private $ssn;
+
     private $salary;
 
     public function __construct(string $name, string $email, string $ssn, string $salary)
@@ -1320,6 +1333,7 @@ class EmployeeTaxData extends Employee
 class EmployeeTaxData
 {
     private $ssn;
+
     private $salary;
 
     public function __construct(string $ssn, string $salary)
@@ -1334,7 +1348,9 @@ class EmployeeTaxData
 class Employee
 {
     private $name;
+
     private $email;
+
     private $taxData;
 
     public function __construct(string $name, string $email)
@@ -1343,7 +1359,7 @@ class Employee
         $this->email = $email;
     }
 
-    public function setTaxData(EmployeeTaxData $taxData)
+    public function setTaxData(EmployeeTaxData $taxData): void
     {
         $this->taxData = $taxData;
     }
@@ -1382,7 +1398,9 @@ more often it comes at some costs:
 class Car
 {
     private $make = 'Honda';
+
     private $model = 'Accord';
+
     private $color = 'white';
 
     public function setMake(string $make): self
@@ -1416,10 +1434,10 @@ class Car
 }
 
 $car = (new Car())
-  ->setColor('pink')
-  ->setMake('Ford')
-  ->setModel('F-150')
-  ->dump();
+    ->setColor('pink')
+    ->setMake('Ford')
+    ->setModel('F-150')
+    ->dump();
 ```
 
 **好:**
@@ -1428,7 +1446,9 @@ $car = (new Car())
 class Car
 {
     private $make = 'Honda';
+
     private $model = 'Accord';
+
     private $color = 'white';
 
     public function setMake(string $make): void
@@ -1517,9 +1537,6 @@ final class Car implements Vehicle
         $this->color = $color;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getColor()
     {
         return $this->color;
@@ -1599,6 +1616,7 @@ class UserAuth
 class UserSettings
 {
     private $user;
+
     private $auth;
 
     public function __construct(User $user)
@@ -1754,6 +1772,7 @@ Liskov Substitution Principle (LSP)
 class Rectangle
 {
     protected $width = 0;
+
     protected $height = 0;
 
     public function setWidth(int $width): void
@@ -1791,7 +1810,7 @@ function printArea(Rectangle $rectangle): void
     $rectangle->setHeight(5);
 
     // BAD: Will return 25 for Square. Should be 20.
-    echo sprintf('%s has area %d.', get_class($rectangle), $rectangle->getArea()).PHP_EOL;
+    echo sprintf('%s has area %d.', get_class($rectangle), $rectangle->getArea()) . PHP_EOL;
 }
 
 $rectangles = [new Rectangle(), new Square()];
@@ -2073,11 +2092,7 @@ function showDeveloperList(array $developers): void
         $expectedSalary = $developer->calculateExpectedSalary();
         $experience = $developer->getExperience();
         $githubLink = $developer->getGithubLink();
-        $data = [
-            $expectedSalary,
-            $experience,
-            $githubLink
-        ];
+        $data = [$expectedSalary, $experience, $githubLink];
 
         render($data);
     }
@@ -2089,11 +2104,7 @@ function showManagerList(array $managers): void
         $expectedSalary = $manager->calculateExpectedSalary();
         $experience = $manager->getExperience();
         $githubLink = $manager->getGithubLink();
-        $data = [
-            $expectedSalary,
-            $experience,
-            $githubLink
-        ];
+        $data = [$expectedSalary, $experience, $githubLink];
 
         render($data);
     }
@@ -2109,11 +2120,7 @@ function showList(array $employees): void
         $expectedSalary = $employee->calculateExpectedSalary();
         $experience = $employee->getExperience();
         $githubLink = $employee->getGithubLink();
-        $data = [
-            $expectedSalary,
-            $experience,
-            $githubLink
-        ];
+        $data = [$expectedSalary, $experience, $githubLink];
 
         render($data);
     }
@@ -2128,11 +2135,7 @@ function showList(array $employees): void
 function showList(array $employees): void
 {
     foreach ($employees as $employee) {
-        render([
-            $employee->calculateExpectedSalary(),
-            $employee->getExperience(),
-            $employee->getGithubLink()
-        ]);
+        render([$employee->calculateExpectedSalary(), $employee->getExperience(), $employee->getGithubLink()]);
     }
 }
 ```
@@ -2156,11 +2159,15 @@ function showList(array $employees): void
    * [panuwizzle/clean-code-php](https://github.com/panuwizzle/clean-code-php)
 * :fr: **French:**
    * [errorname/clean-code-php](https://github.com/errorname/clean-code-php)
-* :vietnam: **Vietnamese**
+* :vietnam: **Vietnamese:**
    * [viethuongdev/clean-code-php](https://github.com/viethuongdev/clean-code-php)
 * :kr: **Korean:**
    * [yujineeee/clean-code-php](https://github.com/yujineeee/clean-code-php)
 * :tr: **Turkish:**
    * [anilozmen/clean-code-php](https://github.com/anilozmen/clean-code-php)
+* :iran: **Persian:**
+   * [amirshnll/clean-code-php](https://github.com/amirshnll/clean-code-php)
+* :bangladesh: **Bangla:**
+   * [nayeemdev/clean-code-php](https://github.com/nayeemdev/clean-code-php)
 
 **[⬆ 返回顶部](#目录)**
